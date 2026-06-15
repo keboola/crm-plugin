@@ -1,0 +1,14 @@
+{
+  "name": "keboola-crm-marketplace",
+  "owner": {
+    "name": "Keboola",
+    "email": "support@keboola.com"
+  },
+  "plugins": [
+    {
+      "name": "keboola-crm",
+      "source": "./keboola-crm",
+      "description": "Sales workflow assistant for Keboola CRM — opportunities, MEDDPICC, pipeline reviews, and data-explorer views & dashboards via the CRM CLI"
+    }
+  ]
+}
