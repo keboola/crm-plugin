@@ -44,10 +44,11 @@ crm views catalog --format json | jq
 Returns:
 * **entities** — read them from the catalog; do not assume a fixed set
   (it widens server-side). Today it serves ``opportunity``, ``account``,
-  ``contact``, and ``order``. Each field carries ``type``, ``operators``,
-  ``groupable``, ``aggregatable`` flags, and for enums an ``enum_values``
+  ``contact``, ``order``, and ``order_item``. Each field carries
+  ``type``, ``operators``, ``groupable``, ``aggregatable`` flags, and for
+  enums an ``enum_values``
   list so you don't have to guess "is it ``offer_negotiation`` or
-  ``Offer/Negotiation``?". Two cross-entity fields worth knowing:
+  ``Offer/Negotiation``?". A few fields worth knowing:
   * ``owner.full_name`` — the owner's display name (on a post-sale
     ``account`` that's the CSM). Use it for display columns and chart
     group-by to get readable axes instead of raw SFIDs. *Filtering* by it
@@ -56,6 +57,16 @@ Returns:
   * ``account`` ``id`` with ``in`` — filtering an account view by a set
     of SFIDs runs at the SQL level (before pagination), so a ``table``
     total matches the identical KPI/chart regardless of sort or limit.
+  * ``order_item`` ``arr`` — the per-line-item entity backs per-product /
+    per-client ARR roll-ups (e.g. a Snowflake reseller spans an
+    ``SNFLK-01`` + ``SNFLK-02`` line). ``arr`` is the annualized figure
+    (recurring × 12, discounts negative, one-off 0 — Order ARR semantics,
+    #924), ``aggregatable`` and sortable. *Filtering* ``arr`` is post-fetch
+    (``eq``/``neq`` only) — same gotcha as ``owner.full_name`` above — so
+    for an exact per-client total, narrow at the SQL level first
+    (``order_status`` ``eq`` ``activated``, ``product_code`` ``in``
+    ``[SNFLK-01, SNFLK-02]``, or ``account_id``), then ``sum`` ``arr``
+    grouped by ``account_name``.
 * **relationships** — explicit FK edges the catalog declares per entity
   (e.g. ``opportunity.account_id → account``,
   ``opportunity.owner_id → user``, ``account.owner_id → user``). Use
