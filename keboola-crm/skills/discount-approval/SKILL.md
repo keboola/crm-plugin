@@ -55,8 +55,8 @@ Discounts require different approval levels based on the percentage:
 
 | Discount Level | Approver Tier | Typical Justification |
 |---------------|---------------|----------------------|
-| ≤ 15% | Tier 1 — Sales Manager | Competitive pressure, multi-year deal |
-| 15–25% | Tier 2 — CRO | Strategic account, market entry, large deal |
+| ≤ 15% (config: discount_approval_tier_ceilings.tier_1) | Tier 1 — Sales Manager | Competitive pressure, multi-year deal |
+| 15–25% (config: discount_approval_tier_ceilings.tier_2) | Tier 2 — CRO | Strategic account, market entry, large deal |
 | > 25% | Tier 3 — CFO / Deal Desk | Exceptional circumstances, executive-level commitment |
 
 **Important rules:**
@@ -139,7 +139,7 @@ After any discount action, summarize:
 ## Related RoE Rules
 
 - **Minimum ACV after discount**: $70K for Core, $75K for Strategic, $200K for Enterprise
-- **Approval chain**: two config-driven flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below `settings.discount_approval_threshold_percent` (default 10%) and create a pending request for manager review above it. Line-item discounts route through the tier ladder `settings.discount_approval_tier_ceilings` — Tier 1 (Sales Manager) ≤15%, Tier 2 (CRO) 15–25%, Tier 3 (CFO / Deal Desk) >25% with no upper cap and no auto-approval. Trust the live config over this line.
+- **Approval chain**: two config-driven flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below 10% (config: discount_approval_threshold_percent) and create a pending request for manager review above it. Line-item discounts route through the tier ladder `settings.discount_approval_tier_ceilings` — Tier 1 (Sales Manager) ≤15%, Tier 2 (CRO) 15–25%, Tier 3 (CFO / Deal Desk) >25% with no upper cap and no auto-approval. Trust the live config over this line.
 - **A discount cannot exceed the price**: `crm discounts request` rejects a percentage above 100 with a 422 (#1104). "No upper cap" above is about *who approves* a deep discount, not about how large the number may be — at 100% the customer pays nothing, and beyond that we would be paying them. If a rep asks for more than 100%, they are describing something else (a credit, a rebate, a negative line item) — clarify what they mean rather than retrying the request.
 - **Multi-year offset**: 3-year commitment grants +5% discount flexibility
 - **No retroactive discounts**: Discounts apply to new/renewal terms only

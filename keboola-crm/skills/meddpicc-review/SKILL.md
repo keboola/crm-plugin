@@ -73,11 +73,11 @@ Analyze each component against quality standards:
 
 #### Decision Process
 - **Good**: 3+ steps with dates, owners, and dependencies (CRO decision D11, 2026-06-09, lowered the Demo-exit gate from 4 to 3). Example: "1. Technical POC (Apr 15, led by CTO) -> 2. Security review (May 1, InfoSec team) -> 3. Budget approval (May 15, CFO) -> 4. Legal review (Jun 1, Legal) -> 5. Signature (Jun 15, CEO)."
-- **Weak**: Fewer than 3 steps, no timeline, missing responsible parties.
+- **Weak**: Fewer than 3 steps (config: stage_min_decision_steps_demo), no timeline, missing responsible parties.
 - **Check**: Is the process documented from the customer's perspective?
 
 #### Identify Pain
-- **Good**: 250+ characters in the customer's own language describing a specific, quantified business problem (matches the configured `stage_pain_statement_min_chars` gate). Example: "Our data engineers spend 60% of their time maintaining fragile Python scripts that break every time a source schema changes. Last quarter we missed two board reporting deadlines because of pipeline failures."
+- **Good**: 250+ characters (config: stage_pain_statement_min_chars) in the customer's own language describing a specific, quantified business problem (matches the configured `stage_pain_statement_min_chars` gate). Example: "Our data engineers spend 60% of their time maintaining fragile Python scripts that break every time a source schema changes. Last quarter we missed two board reporting deadlines because of pipeline failures."
 - **Weak**: Generic vendor-speak like "needs modern data platform" or under 250 characters.
 - **Check**: Is this pain confirmed by a stakeholder?
 
