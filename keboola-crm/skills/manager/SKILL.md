@@ -82,7 +82,7 @@ Detailed forecast view: commit, best case, and pipeline categories with ARR tota
 crm reports forecast
 ```
 
-ARR by forecast category (commit, best case, pipeline) for the current quarter. Cross-reference with `crm territory quota` to identify coverage gaps.
+ARR by forecast category (commit, best case, pipeline) for the current quarter. Cross-reference with `crm forecast show --year <FY>` to identify coverage gaps.
 
 #### Win/loss analysis
 
@@ -110,25 +110,43 @@ When running as a manager (with `CRM_USER_EMAIL` set to a rep's email for inspec
 
 ---
 
-### Quota Management
+### Target Management
 
-#### Team quota overview
-
-```bash
-crm territory quota
-crm territory quota --year 2025
-crm territory quota --year 2025 --quarter Q2
-```
-
-Shows quota attainment per rep: quota target, closed-won ARR, pipeline coverage (commit + best case), and attainment percentage. Use this to identify reps behind plan and reps with pipeline coverage gaps.
-
-#### Individual rep quota
+#### Team forecast overview
 
 ```bash
-crm territory quota --year 2025 --quarter Q2
+crm forecast show --year 2026 --format human
+crm forecast show --year 2026 --period-type month --format human
 ```
 
-Detailed quota breakdown for the current user or a specific rep.
+One table per owner plus a Company footer, showing Closed Won, Commit, Best Case and
+Pipeline against each owner's assigned target, with attainment, gap and coverage. Use
+it to spot reps behind plan and reps with coverage gaps.
+
+Two readings to get right:
+
+- A target shown as `—` means **nobody assigned one**, not zero. Do not tell a rep
+  they are at 0% attainment when the real state is that no target exists — set one.
+- A non-zero **Unknown** column means that period's totals understate reality: those
+  deals are existing business with no priced predecessor linked, so their net-new ARR
+  cannot be determined and they are excluded from every sum.
+
+#### One rep
+
+```bash
+crm forecast show --year 2026 --owner <user_id> --format human
+```
+
+#### Assign a target
+
+```bash
+crm targets set --scope-id <user_id> --amount 500000 --year 2026 --period-index 1
+crm targets coverage --year 2026 --format human
+```
+
+`coverage` compares the company target against the sum of the individual ones.
+Over-assigning is normal practice — the company target is assigned independently, not
+derived — so a positive `over_assignment` is not an error.
 
 ---
 
@@ -288,7 +306,7 @@ Overview of all territories: rep assignments, account counts, pipeline ARR per t
 crm territory show TERRITORY_CODE
 ```
 
-Detailed view of a territory: rep owner, all accounts, pipeline breakdown, named accounts, and territory quota vs attainment.
+Detailed view of a territory: rep owner, all accounts, pipeline breakdown, and named accounts.
 
 #### Territory owner assignment
 
@@ -467,7 +485,7 @@ crm pipeline health
 crm reports stale
 
 # 4. Quota coverage check
-crm territory quota --quarter Q2
+crm forecast show --year 2026
 
 # 5. Critical alerts needing attention
 crm alerts list --severity critical
@@ -552,7 +570,7 @@ Run before every forecast call with leadership:
 crm pipeline forecast
 
 # 2. Cross-reference with quota
-crm territory quota --quarter Q2
+crm forecast show --year 2026
 
 # 3. Win/loss context
 crm reports win-loss
@@ -728,7 +746,7 @@ crm pipeline health
 
 # 3. Forecast accuracy check (commit vs actual closed)
 crm reports forecast
-crm territory quota
+crm forecast show --year 2026
 ```
 
 Key questions:
@@ -766,7 +784,7 @@ Key questions:
 **Quota reforecasting**:
 - Review quota coverage at week 6 of each quarter
 - If a rep is tracking below 50% attainment at week 6, flag for VP review
-- Use `crm territory quota --quarter QX` to get precise attainment data
+- Use `crm forecast show --year <FY>` to get precise attainment data
 
 ---
 
@@ -780,7 +798,7 @@ User: Run me through the team's pipeline status for this week.
 Steps:
 1. crm pipeline show           — overall pipeline snapshot
 2. crm pipeline health         — systemic issues to address
-3. crm territory quota --quarter Q2 — who is behind plan?
+3. crm forecast show --year 2026 — who is behind plan?
 4. crm reports stale           — activity hygiene issues
 5. crm alerts list --severity critical  — fires to put out today
 6. crm discounts list --status pending  — approvals to process
@@ -821,7 +839,7 @@ User: Prepare me for the Q2 forecast review with the CEO tomorrow.
 
 Steps:
 1. crm pipeline forecast        — commit / best case / pipeline totals
-2. crm territory quota --quarter Q2  — attainment per rep, total team
+2. crm forecast show --year 2026  — attainment per rep, total team
 3. crm reports win-loss         — win rate trends to contextualize the forecast
 4. crm alerts list --severity critical  — any large deals at risk?
 
@@ -866,7 +884,7 @@ User: We need to review territory assignments before Q3 starts. Run the analysis
 Steps:
 1. crm territory show           — all territories: pipeline ARR, account count, quota
 2. crm accounts list --named-only  — named account distribution by territory
-3. crm territory quota --quarter Q3  — quota per rep in each territory
+3. crm forecast show --year 2026 --quarter Q3  — quota per rep in each territory
 
 Analysis output:
 - Territory with most accounts but least pipeline: whitespace opportunity or rep effectiveness issue?

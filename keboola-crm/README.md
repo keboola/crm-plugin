@@ -27,7 +27,7 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 | `contract-management` | `/contract-management` | Manage contracts — create, renew, amend, history chain, bookings |
 | `invoice-management` | `/invoice-management` | Manage invoices — create, send, payments, aging, credit notes |
 | `commission-management` | `/commission-management` | Manage commissions — plans, earnings, statements, clawbacks |
-| `quota-attainment` | `/quota-attainment` | Track quota attainment and pipeline coverage |
+| `forecast-attainment` | `/forecast-attainment` | Track attainment against assigned targets and pipeline coverage |
 | `territory-management` | `/territory-management` | Manage territories — assignments, reassignment, auto-assign |
 | `competitive-intel` | `/competitive-intel` | Competitive intelligence — battlecards, pre-call briefs |
 | `discount-approval` | `/discount-approval` | Discount request and approval workflow with thresholds |
@@ -133,7 +133,7 @@ All skills are namespaced: `/keboola-crm:<skill-name>`.
 /commission-management How much have I earned this quarter?
 
 # Quota attainment
-/quota-attainment Am I on track to hit my number?
+/forecast-attainment Am I on track to hit my number?
 
 # Territory management
 /territory-management Auto-assign the new account — HQ is in Germany

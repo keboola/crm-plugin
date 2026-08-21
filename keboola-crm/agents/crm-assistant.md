@@ -110,7 +110,7 @@ specific):
 | manage post-close orders / renewals | `contract-management` *(orders-based)* |
 | invoices, billing, payments | `invoice-management` |
 | commissions, statements, clawbacks | `commission-management` |
-| quota attainment / coverage | `quota-attainment` |
+| target attainment / coverage | `forecast-attainment` |
 | territories, assignments | `territory-management` |
 | battlecards / competitor prep | `competitive-intel` |
 | discount request / approval | `discount-approval` |

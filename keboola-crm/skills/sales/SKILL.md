@@ -572,17 +572,20 @@ Generates a complete sales-to-CS handover brief. Includes: account summary, deal
 crm territory show
 ```
 
-Shows your assigned territory: covered regions, named accounts, account count, total pipeline ARR, and territory quota.
+Shows your assigned territory: covered regions, named accounts, account count, and total pipeline ARR.
 
-#### View my quota
+#### View my attainment
 
 ```bash
-crm territory quota
-crm territory quota --year 2025
-crm territory quota --year 2025 --quarter Q2
+crm forecast show --year 2026 --format human
+crm forecast show --year 2026 --period-type month --format human
 ```
 
-Shows your quota target vs. pipeline coverage and closed-won ARR for the period.
+Shows Closed Won, Commit, Best Case and Pipeline against your assigned target for
+each period, plus attainment, gap and coverage.
+
+A target shown as `—` means **nobody assigned one** — not zero. Do not report 0%
+attainment for such a period; the answer is that no target is set.
 
 #### Forecast report
 
