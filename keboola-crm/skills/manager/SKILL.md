@@ -128,8 +128,13 @@ Two readings to get right:
 - A target shown as `—` means **nobody assigned one**, not zero. Do not tell a rep
   they are at 0% attainment when the real state is that no target exists — set one.
 - A non-zero **Unknown** column means that period's totals understate reality: those
-  deals are existing business with no priced predecessor linked, so their net-new ARR
-  cannot be determined and they are excluded from every sum.
+  deals have no determinable net-new ARR — either no opportunity type is set or
+  nothing prices them — so they are excluded from every sum.
+- **A zero Unknown column does not mean the period is right.** A renewal with no
+  predecessor order linked is counted at its FULL contract value, so it *overstates*
+  the period and never shows up in Unknown. Run `crm forecast opportunities` and
+  look at the **Flag** column: `over: no pred` marks those deals, and
+  the fix is to link the predecessor order.
 
 #### One rep
 
