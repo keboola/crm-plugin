@@ -52,7 +52,8 @@ order. The three `out:` markers are the understating cases above.
 ### Step 1: Understand the request
 
 - **Am I on track?** — personal forecast row
-- **Team view** — every owner's row plus a company total
+- **Team view** — a row for every owner **holding a target**, a `Total` row over
+  those rows, and a separate org-wide `company` figure
 - **Set a target** — assign for a scope and period
 - **Coverage** — pipeline against the remaining target
 - **Company vs individual** — the over-assignment delta
@@ -63,7 +64,8 @@ order. The three `out:` markers are the understating cases above.
 crm forecast show --year 2026 --format human
 ```
 
-One table per owner plus a Company footer, one row per fiscal period, with:
+One table per owner plus a **`Total`** footer table, one row per fiscal period,
+with:
 
 - **Closed Won** — booked net-new ARR
 - **Commit** — won, plus high-probability deals that are **not stalled**
@@ -74,6 +76,70 @@ One table per owner plus a Company footer, one row per fiscal period, with:
 - **Gap** — Target − Commit (negative means committed over target)
 - **Cov** — Pipeline ÷ remaining target; `—` once the target is met
 - **Unknown** — deals whose net-new ARR could not be determined
+
+### Three things about this grid that will mislead you if you skip them
+
+Changed 2026-08-24 (design spec §4.1/§4.2/§4.6). All three are load-bearing when you
+summarise a forecast for a human.
+
+**1. A row exists because someone assigned that person a TARGET — not because they
+own a deal.** The grid lists exactly the owners holding a target for the selected year
+and quarters. So:
+
+- **An owner missing from the grid may still own plenty of pipeline.** Never say "X
+  has no deals" or "X is not forecasting" from an absent row. It means nobody assigned
+  them a number.
+- `--owner <id>` is **intersected** with that set, so naming an untargeted owner
+  returns *no row*, not an empty one. `available_owners` in the JSON lists the owners
+  that can be rows; read it before asserting who exists.
+- Your own row always appears, target or not.
+
+**2. `rows: []` is an ordinary answer, and `empty_reason` says which one.**
+Production held **zero** targets when this rule shipped, so an empty grid is the
+day-one state, not a broken endpoint. Read `empty_reason` from `--format json` and
+report the one you were given — they have three different fixes:
+
+| `empty_reason` | What it means | What to tell the user |
+|---|---|---|
+| `no_targets_in_fiscal_year` | Nobody holds a target for this metric and year | Assign targets in Settings → Targets |
+| `no_targets_in_selected_quarters` | The year has targets, the selected quarters do not | Widen `--quarter`, or target those quarters |
+| `owner_filter_matches_no_targeted_owner` | Targets exist, but not for the owners in `--owner` | Drop the filter to see who does hold one |
+
+**Never present an empty grid as "the company has no pipeline."** Check `company`
+first — it is almost certainly non-zero.
+
+**3. `company` is the organisation; the `Total` table is not.** The JSON's `company`
+object covers **every** opportunity in range — whoever owns it, whether or not anyone
+targeted them, and regardless of `--owner`. The `Total` table sums only the rows above
+it. The two are *expected* to differ whenever a deal belongs to an untargeted owner or
+a filter is active; that difference is a fact about the book, so do not report it as an
+inconsistency and do not reconcile one against the other.
+
+- `company.aggregate` — the org's Closed Won / Commit / Best Case / Pipeline, plus the
+  separately-assigned **company** target and its attainment.
+- `company.over_assignment` — every assigned owner target minus the company target,
+  paired per period. Positive means the individuals were deliberately given more than
+  the company number, which is normal practice.
+- `company` is **`null` when, and only when, the caller lacks `forecast.read`.** Then
+  you have no org figure at all — say so, rather than summing the visible rows and
+  calling the result the company.
+
+**`crm forecast show --format human` does not print the company figure.** It prints the
+per-owner tables and the `Total` footer only. Use `--format json` when the question is
+about the organisation.
+
+**When there are no rows, `--format human` prints the `empty_reason` explanation on
+STDOUT and no tables at all.** That is deliberate: every figure in them would be
+zero, and a zeroed `Total` footer reads as "the org has no pipeline" while `company`
+is typically non-zero at the same moment. So the output is a sentence rather than a
+table — read it and report the fix it names, and do not treat a table-less result as
+a failed command.
+
+An earlier version of this paragraph said "an empty human output is the explanation".
+That was true only by accident of where the text went: the explanation was on
+**stderr**, so an agent piping stdout got nothing at all and the sentence telling it
+why was on a stream it was not reading. The message now goes to stdout, so there is
+no "empty output" case to interpret.
 
 A single owner:
 
@@ -117,7 +183,15 @@ crm targets coverage --year 2026 --format human
 ```
 
 `over_assignment` is how far the sum of individual targets exceeds the company
-number. **Over-assigning is normal practice** — the company target is assigned
+number, **per period** — this command returns one row per fiscal period, and each
+row's delta compares that period's owner targets against that period's company
+target. Do not add the column up and present the result as an annual
+over-assignment: a period with no company target has no delta to contribute, so a
+total would silently mix covered and uncovered periods. (`crm forecast show`'s
+`company.over_assignment` is the same rule already summed across the selection, over
+only the periods that carry a company target.)
+
+**Over-assigning is normal practice** — the company target is assigned
 independently, not derived as the sum — so do not present the sum as the company
 target, and do not call a positive delta an error.
 
