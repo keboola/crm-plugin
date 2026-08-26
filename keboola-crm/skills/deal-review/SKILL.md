@@ -29,14 +29,14 @@ crm accounts get <account_id>
 crm contacts list --account-id <account_id> --format human
 ```
 
-For a portfolio-wide triage scan ahead of the deal review (find the deals that need this treatment in the first place), use the new amount/close-date filters:
+For a portfolio-wide triage scan ahead of the deal review (find the deals that need this treatment in the first place), use the new ARR/close-date filters:
 
 ```bash
 # Big deals closing this quarter
-crm opportunities list --amount-min 100000 --close-date-from 2026-04-01 --close-date-to 2026-06-30 --format human
+crm opportunities list --arr-min 100000 --close-date-from 2026-04-01 --close-date-to 2026-06-30 --format human
 
 # Bounded ACV bucket
-crm opportunities list --amount-min 50000 --amount-max 250000 --format human
+crm opportunities list --arr-min 50000 --arr-max 250000 --format human
 
 # Renewal book of business
 crm opportunities list --type existing_business_renewal --format human

@@ -29,7 +29,7 @@ crm analytics dashboard
 crm analytics arr
 ```
 
-`crm pipeline show` accepts `--owner <user_id>` and `--territory <code>` to scope the view to a specific rep or region. Deeper slices requested by the CRO audit (`--quarter`, `--type`, `--view`, `--csm-owner-id`, `--ending-within`, `--segment`) are not yet exposed — see the NOTE block in `crm pipeline show --help`. For now, fall back to `crm opportunities list` with `--stage`, `--owner`, `--account`, `--amount-min/--amount-max`, `--close-date-from/--close-date-to` to approximate them.
+`crm pipeline show` accepts `--owner <user_id>` and `--territory <code>` to scope the view to a specific rep or region. Deeper slices requested by the CRO audit (`--quarter`, `--type`, `--view`, `--csm-owner-id`, `--ending-within`, `--segment`) are not yet exposed — see the NOTE block in `crm pipeline show --help`. For now, fall back to `crm opportunities list` with `--stage`, `--owner`, `--account`, `--arr-min/--arr-max`, `--close-date-from/--close-date-to` to approximate them.
 
 Common scoped views that already work today:
 
