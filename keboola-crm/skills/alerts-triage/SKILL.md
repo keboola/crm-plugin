@@ -35,12 +35,12 @@ Determine which alert workflow the user needs:
 crm alerts list                                    # default = unacknowledged
 crm alerts list --severity critical
 crm alerts list --severity high
-crm alerts list --type stale_deal
+crm alerts list --type stalled
 crm alerts list --alert-type checkin_overdue       # alias of --type
 crm alerts list --all --format human               # include already acknowledged
 ```
 
-`--type` (or its alias `--alert-type`) accepts a single value per call. Common CSM-relevant types: `checkin_overdue`, `usage_threshold`, `eb_engagement_stale`, `champion_not_tested`, `stale_deal`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `escalation`. To triage a specific category for a CSM book, run e.g. `crm alerts list --type checkin_overdue --format human`.
+`--type` (or its alias `--alert-type`) accepts a single value per call. Common CSM-relevant types: `checkin_overdue`, `usage_threshold`, `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`. To triage a specific category for a CSM book, run e.g. `crm alerts list --type checkin_overdue --format human`.
 
 A bundled `--for-csm` preset (one flag, multiple types) and a repeatable `--alert-type` (multiple types in one call) are requested by the CSM audit but not yet exposed by `GET /api/alerts` — see the NOTE block in `crm alerts list --help`. Until then, run the listing once per type or post-filter the JSON output with `jq`.
 

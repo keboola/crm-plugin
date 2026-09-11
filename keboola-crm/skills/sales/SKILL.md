@@ -99,7 +99,7 @@ Lists CRM alerts such as: close date overdue, no champion identified, missing ec
 
 | Alert Type | Meaning | Typical Severity |
 |---|---|---|
-| `stale_deal` | No logged activity in 14+ days | high |
+| `stalled` | No stage change or logged activity in 30+ days | high |
 | `meddpicc_gap` | Critical MEDDPICC field missing for current stage | medium–high |
 | `close_date_risk` | Close date is past due or within 7 days with blockers | critical |
 | `champion_cold` | Champion contact has not been engaged in 30+ days | high |

@@ -469,7 +469,7 @@ Alerts across all team accounts. Critical alerts require immediate manager atten
 crm alerts summary
 ```
 
-Shows a summary count of alerts grouped by severity (critical, high, medium, low) and by type (stale_deal, meddpicc_gap, close_date_risk, etc.). Use this for a quick daily triage to understand the overall alert landscape before diving into individual alerts. The summary view is faster than scrolling through the full alert list when you manage a large team.
+Shows a summary count of alerts grouped by severity (critical, high, medium, low) and by type (stalled, no_followup, close_date_risk, etc.). Use this for a quick daily triage to understand the overall alert landscape before diving into individual alerts. The summary view is faster than scrolling through the full alert list when you manage a large team.
 
 ---
 
