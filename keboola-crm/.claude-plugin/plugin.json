@@ -1,6 +1,6 @@
 {
   "name": "keboola-crm",
-  "version": "0.84.81",
+  "version": "0.84.82",
   "description": "Sales workflow assistant for Keboola CRM — manage opportunities, MEDDPICC qualification, pipeline reviews, and deal progression using the CRM CLI",
   "author": {
     "name": "Keboola",
