@@ -118,11 +118,17 @@ default) and read the step summary.
 ## 5. Empty weeks and failures
 
 - **Nothing user-facing selected** → no file, no commit, no entry. The run
-  exits 0 and the decisions table says why.
-- **The model reply could not be parsed** → nothing is selected and nothing is
-  published, deliberately: a title-only or invented changelog reaching every
-  CRM user is worse than a missing week plus a red-ish log. Re-run with
-  `--dry-run` to see the reply.
+  exits 0 and the decisions table says why. This is the genuinely quiet
+  week: the selection call replied with valid JSON and every PR was excluded.
+- **The selection reply could not be parsed as JSON at all** → a different,
+  louder case, not a quiet week: nothing is selected and nothing is
+  published, but the run exits 1 with an `::error::` line and a step-summary
+  entry, so the Slack alert fires instead of silently looking like a quiet
+  week. Re-run with `--dry-run` and check the raw reply preview printed to
+  the log (or reproduce locally with a real `ANTHROPIC_API_KEY`).
+- **The writing reply could not be parsed, or the link/mention guard
+  discarded the composed entry** → same loud treatment: exit 1, `::error::`,
+  step summary, raw reply preview in the log.
 - **`ANTHROPIC_API_KEY` missing** → exits 1 before any model call.
 
 ## Related
