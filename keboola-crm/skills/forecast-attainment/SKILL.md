@@ -221,4 +221,3 @@ stalled deal is the first thing to check.
 
 - `pipeline-review` — deal-by-deal inspection behind these totals
 - `revenue-analytics` — ARR / NRR / bookings reporting
-- `commission-management` — payouts (a separate money basis; see epic #1270)

@@ -1,6 +1,6 @@
 ---
 name: sales
-description: Sales rep assistant — meeting prep, pipeline management, MEDDPICC qualification, deal progression, account research, orders, invoicing, and commissions
+description: Sales rep assistant — meeting prep, pipeline management, MEDDPICC qualification, deal progression, account research, orders, and invoicing
 allowed-tools: ['Bash']
 ---
 
@@ -594,43 +594,6 @@ crm reports forecast
 ```
 
 Shows forecast categories (commit, best case, pipeline) with ARR totals and vs-quota tracking.
-
----
-
-### Commissions
-
-#### /my-commission — YTD earnings summary
-
-```bash
-crm commissions my
-crm commissions my --period 2026-Q1
-```
-
-Shows total earned, pending approval, paid, and projected commissions from pipeline. Run every Monday to stay on top of your earnings and pending approvals. Your commissions are calculated automatically from closed-won deals.
-
-#### /commission-statement — Deal-by-deal breakdown
-
-```bash
-crm commissions statement 2026-Q1
-```
-
-Shows the full statement for a quarter: base earnings, accelerator bonus, clawback deductions, and net commission. Lists every contributing deal with its ARR, rate applied, and commission amount.
-
-#### /commission-forecast — Projected earnings from pipeline
-
-```bash
-crm commissions forecast
-```
-
-Projects your commission from all open pipeline deals, weighted by stage probability (Discovery 20%, Demo 30%, POC 60%, Offer 90% — config-driven `stage_probabilities`, #910). Use this to see what you stand to earn if current deals close as expected. The more deals you advance in stage, the higher the projection.
-
-#### /commission-plan — My current plan with tiers
-
-```bash
-crm commissions plan
-```
-
-Displays your active commission plan: base rate, accelerator tiers, effective dates, and guarantee period. Shows example commission amounts at $100K ARR for each tier. Know your plan — hitting 100%+ quota unlocks higher rates on every deal.
 
 ---
 

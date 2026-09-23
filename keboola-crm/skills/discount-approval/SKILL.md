@@ -133,7 +133,6 @@ After any discount action, summarize:
 
 3. **Impact Analysis**
    - Effect on deal probability
-   - Commission impact
    - Segment compliance (still above minimum ACV?)
 
 ## Related RoE Rules

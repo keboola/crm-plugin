@@ -163,7 +163,7 @@ Before approving, verify:
 - The reassignment reason is legitimate
 - Both territory owners are aware
 - Active deals have a handover plan
-- No commission disputes will arise
+- No credit disputes will arise
 - The move makes strategic sense
 
 If rejecting, provide a clear reason and alternative suggestion.
@@ -173,7 +173,7 @@ If rejecting, provide a clear reason and alternative suggestion.
 - **Territory assignment**: Based on account HQ country; overrides require VP approval
 - **Named accounts**: Strategic accounts are explicitly assigned regardless of geography
 - **Account handover**: When territory changes, all active opportunities transfer with the account
-- **Commission protection**: Deals in Offer/Negotiation stage at time of reassignment stay with the original rep
+- **Deal credit protection**: Deals in Offer/Negotiation stage at time of reassignment stay with the original rep
 - **Rebalancing**: Territory reviews happen quarterly; mid-quarter changes are exceptional
 - **Overlap resolution**: If an account has subsidiaries in multiple territories, the parent account territory takes precedence
 

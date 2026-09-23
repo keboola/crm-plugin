@@ -1,6 +1,6 @@
 # Keboola CRM Plugin for Claude Code
 
-A Claude Code plugin that helps sales reps, managers, and CS teams manage their CRM workflow using the Keboola CRM CLI. Provides role-based and task-based skills covering the full sales cycle from account research through deal close, invoicing, commissions, and revenue analytics. (A few contributor-only skills used when developing the CRM monorepo itself — e.g. `/architecture-brief` — are excluded from the public marketplace build.)
+A Claude Code plugin that helps sales reps, managers, and CS teams manage their CRM workflow using the Keboola CRM CLI. Provides role-based and task-based skills covering the full sales cycle from account research through deal close, invoicing, and revenue analytics. (A few contributor-only skills used when developing the CRM monorepo itself — e.g. `/architecture-brief` — are excluded from the public marketplace build.)
 
 ## Available Skills
 
@@ -10,7 +10,7 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 |-------|---------|-------------|
 | `sales` | `/sales` | Sales rep workflow — meetings, pipeline, MEDDPICC, deal closing |
 | `cs` | `/cs` | Customer success — renewals, health monitoring, QBR prep |
-| `manager` | `/manager` | Sales manager — team pipeline, quotas, approvals, commissions |
+| `manager` | `/manager` | Sales manager — team pipeline, quotas, approvals |
 
 ### Task-Based Skills
 
@@ -26,7 +26,6 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 | `prep-meeting` | `/prep-meeting` | Prepare for customer meeting with full context |
 | `contract-management` | `/contract-management` | Manage contracts — create, renew, amend, history chain, bookings |
 | `invoice-management` | `/invoice-management` | Manage invoices — create, send, payments, aging, credit notes |
-| `commission-management` | `/commission-management` | Manage commissions — plans, earnings, statements, clawbacks |
 | `forecast-attainment` | `/forecast-attainment` | Track attainment against assigned targets and pipeline coverage |
 | `territory-management` | `/territory-management` | Manage territories — assignments, reassignment, auto-assign |
 | `competitive-intel` | `/competitive-intel` | Competitive intelligence — battlecards, pre-call briefs |
@@ -128,9 +127,6 @@ All skills are namespaced: `/keboola-crm:<skill-name>`.
 
 # Invoice management
 /invoice-management Show unpaid invoices for Acme Corp
-
-# Commission tracking
-/commission-management How much have I earned this quarter?
 
 # Quota attainment
 /forecast-attainment Am I on track to hit my number?
