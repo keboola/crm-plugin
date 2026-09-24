@@ -31,7 +31,7 @@ changelog means editing it — not editing the script.
 ## 1. Dry-run a window
 
 ```bash
-export ANTHROPIC_API_KEY=...            # any key with Messages API access
+export GEMINI_API_KEY=...               # a Gemini Developer API key (Google AI Studio)
 GH_TOKEN=$(gh auth token) \
   python3 scripts/ci/weekly_changelog.py --dry-run --from-ref v0.83.1
 ```
@@ -125,11 +125,11 @@ default) and read the step summary.
   published, but the run exits 1 with an `::error::` line and a step-summary
   entry, so the Slack alert fires instead of silently looking like a quiet
   week. Re-run with `--dry-run` and check the raw reply preview printed to
-  the log (or reproduce locally with a real `ANTHROPIC_API_KEY`).
+  the log (or reproduce locally with a real `GEMINI_API_KEY`).
 - **The writing reply could not be parsed, or the link/mention guard
   discarded the composed entry** → same loud treatment: exit 1, `::error::`,
   step summary, raw reply preview in the log.
-- **`ANTHROPIC_API_KEY` missing** → exits 1 before any model call.
+- **`GEMINI_API_KEY` missing** → exits 1 before any model call.
 
 ## Related
 
