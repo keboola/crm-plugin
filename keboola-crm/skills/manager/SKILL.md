@@ -333,8 +333,9 @@ Personal Access Tokens (PATs) are used for API authentication with the CRM CLI.
 
 **Token lifecycle management:**
 - Revoke compromised tokens immediately — there is no grace period
-- Audit active tokens quarterly: review who has tokens, when they expire, and whether they are still needed
-- When a team member leaves, revoke all their tokens as part of the offboarding process
+- Audit tokens quarterly (admin, `users.manage`): `crm auth admin-tokens list --exclude-revoked --format human` lists every personal and service token that is not revoked, with its owner and a `status` computed by the API (read it, do not re-derive it from the dates). Review who holds what, what expires, and what is still needed; revoke with `crm auth admin-tokens revoke <TOKEN_ID> --confirm`. In the web UI, admins see the same data under **Settings > API Tokens**: personal tokens in **Personal Access Tokens** (All users), service tokens in **Service Tokens**
+- A token whose status is `owner_inactive` belongs to someone who can no longer sign in — revoke it
+- When a team member leaves, deactivating them revokes all their tokens, personal and service, in the same step; `crm auth admin-tokens list --user <USER_ID> --exclude-revoked` shows beforehand which ones, so any integration on their service tokens can be moved to a new token first
 - Do not share tokens between users — each user should have their own token
 
 **Setup for new team members:**
