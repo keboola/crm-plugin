@@ -20,7 +20,10 @@ published by
 [`.github/workflows/weekly-changelog.yml`](../../../../.github/workflows/weekly-changelog.yml)
 on its Sunday cron (`0 13 * * 0`, ~15:00 CEST). The scheduled run **publishes
 directly**: it commits `docs/changelog/<date>.md` to `main` as the release bot,
-which triggers `changelog-publish.yml` (cursor tag → GitHub Release → Slack).
+which triggers `changelog-publish.yml` (cursor tag → GitHub Release). Slack is
+posted later, by `changelog-announce.yml`, once a successful production deploy
+serves a commit containing the entry — the same push cuts the release that
+gets it there — and an `announced/changelog-<date>` marker tag records it.
 
 There is **no `changelog` label**. The generator receives every PR merged in
 the window and the model selects the user-facing ones by following
@@ -96,8 +99,9 @@ has no repository access.
 
 The entry is a normal file on `main`, so a typo is a one-line PR against
 `docs/changelog/<date>.md` — the in-app `/releases` page renders straight from
-`main`, and `changelog-publish.yml` does not re-tag, re-release or re-announce
-an entry whose tag already exists.
+`main`, and `changelog-publish.yml` does not re-tag an entry whose tag already
+exists (it refreshes the Release notes), and `changelog-announce.yml` does not
+re-announce one that has an `announced/` marker.
 
 To have the model rewrite a whole week:
 
@@ -107,10 +111,12 @@ gh workflow run "Weekly Changelog" \
   -f dry_run=false -f force_tag=true
 ```
 
-`force_tag` overwrites the existing entry file. The already-published tag,
-Release and Slack post stay as they are — Slack does not announce the same week
-twice — so a rewrite reaches readers through `/releases` and the file, not
-through a second announcement.
+`force_tag` overwrites the existing entry file and refreshes the Release notes.
+The already-published tag and Slack post stay as they are — the week's
+`announced/` marker keeps Slack from announcing it twice — so a rewrite reaches
+readers through `/releases` and the file, not through a second announcement.
+(To re-post deliberately: `gh workflow run "Announce weekly changelog" -f
+tag=changelog-<date> -f force=true`.)
 
 To rehearse the same thing first, run it with `dry_run=true` (the dispatch
 default) and read the step summary.
@@ -139,3 +145,6 @@ default) and read the step summary.
   `cd api && uv run python -m pytest ../scripts/test_weekly_changelog.py -q --noconftest`.
 - `scripts/ci/release_slack_summary.py` — turns the entry's `slack:` bullets into
   the Slack post and the `/releases#<date>` deep link.
+- `scripts/ci/changelog_announce.py` — decides which entries production now
+  serves and nobody has announced (tested by `scripts/test_changelog_announce.py`
+  and `scripts/test_changelog_announce_workflow.py`).
