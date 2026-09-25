@@ -42,13 +42,14 @@ Opportunity (closed_won)
   -> Customer pays                        (record-payment; status: paid)
 ```
 
-Trigger the engine manually:
+> **The CRM no longer issues invoices (#1340, ADR 2026-09-07).** ABRA Flexi
+> and Xero do, and the CRM mirrors each document back read-only.
+> `crm invoices generate-from-orders` is retired and answers 409; it is kept
+> registered only because #1349 re-points it at the ABRA push. The flow above
+> describes what the engine *used to* do and is retained for context on rows
+> created before the cutover.
 
-```bash
-crm invoices generate-from-orders --format human
-```
-
-Engine selection criteria (all four must hold for an Order to bill):
+The selection criteria the retired engine applied (all four had to hold):
 1. ``status == 'activated'`` (not draft, not cancelled)
 2. ``billing_cycle`` is set
 3. ``next_billing_date <= today``
@@ -94,18 +95,15 @@ Present:
 - **Totals**: Subtotal, tax, total amount
 - **Payment status**: Paid amount, remaining balance, payment history
 
-### Step 4: Create an Invoice
+### Step 4: Issue the invoice — in the accounting system, not here
 
-```bash
-crm invoices create
-```
+`crm invoices create` is **retired (#1340)** and answers 409. The document is
+issued in ABRA Flexi (or Xero for the US entity) and reaches the CRM through the
+mirror, so there is nothing to create from this side.
 
-Gather required information:
-- Account/contract to invoice against
-- Line items (description, quantity, unit price)
-- Invoice date and payment terms (Net 30, Net 45, Net 60)
-- Currency
-- Any special notes or PO number
+What still belongs to the CRM: reviewing what was issued, checking it against
+the order, recording settlement, and voiding. A correction to a document the
+accounting system issued is a credit note **raised there**, not here.
 
 Validation:
 - Verify the account has a valid billing contact and address

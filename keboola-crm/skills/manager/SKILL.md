@@ -925,9 +925,8 @@ crm invoices send INVOICE_ID --confirm
 crm invoices record-payment INVOICE_ID --amount 10000 --method wire
 crm invoices record-payment INVOICE_ID --amount 5000 --date 2026-03-15 --method ach
 
-# Create invoice manually (post-close revenue is order-anchored; use --order)
-crm invoices create --account ACCOUNT_ID --amount 10000 --notes "Q1 subscription"
-crm invoices create --order ORDER_ID --account ACCOUNT_ID --amount 12000
+# Creating an invoice is RETIRED (#1340) — ABRA Flexi / Xero issue them and the
+# CRM mirrors them read-only. `crm invoices create` answers 409.
 ```
 
 ### Void an invoice
