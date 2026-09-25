@@ -1010,6 +1010,9 @@ crm orders activate NEW_ORDER_ID --format human
 The renewal draft created in Step 3 is inactive until Step 4. Until you run
 `crm orders activate`, the parent order remains the source of truth and the
 renewal does not count toward ARR. Always confirm signature before activating.
+A renewal signed outside the CRM needs `--client-signed-at YYYY-MM-DD` (the date
+on the signed document) — without it the server answers 422
+`client_signed_at_required`. Ask the user for the date; never infer it.
 
 ### Handling mid-term changes (amendments)
 

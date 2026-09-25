@@ -3,7 +3,7 @@
 Public distribution of the `keboola-crm` Claude Code plugin. The
 source of truth is Keboola's private CRM monorepo; **this repo is
 regenerated automatically on every CRM release** (currently
-v0.85.11) — do not edit it by hand.
+v0.85.12) — do not edit it by hand.
 
 ## Install
 
