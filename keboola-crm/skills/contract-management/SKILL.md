@@ -141,19 +141,22 @@ The history chain shows:
 ### Step 8: Generate Bookings Report
 
 ```bash
-crm analytics bookings
+crm bookings carr --format human
+crm bookings deals --month 2026-07 --format human
 ```
 
-Optionally scope the report by quarter and year, e.g. `crm analytics
-bookings --quarter Q1 --year 2026`.
+Scope the report with `--from` / `--to` and `--period month|quarter|fy`, e.g.
+`crm bookings carr --from 2026-01-01 --to 2026-03-31`.
 
-The bookings report shows:
-- New business bookings (new logos)
-- Renewal bookings
-- Expansion bookings (upsells, amendments)
-- Contraction (downsells)
-- Churn (non-renewals)
-- Net bookings total
+`crm bookings carr` shows contracted ARR per fiscal period:
+- BoP and EoP (EoP of one period is BoP of the next)
+- New business (new logos)
+- Expansion (upsells, amendments, contracted step-ups)
+- Downsell and churn (negative)
+- Net new ARR, and the fiscal-year box with year to date
+
+`crm bookings deals` lists one row per deal × movement — including the renewal
+rows, which change no ARR but show the run rate renewed.
 
 ## Related RoE Rules
 
@@ -169,7 +172,7 @@ The bookings report shows:
 - "Renew order ord_15 with a 10% price increase"
 - "Amend order ord_15 to add the data apps SKU"
 - "Show the full renewal history for order ord_15"
-- "Generate a bookings report for Q1"
+- "Show contracted ARR by quarter for this fiscal year"
 - "/contract-management"
 - "What orders are expiring in the next 90 days?"
 - "Create an order from opportunity 42"

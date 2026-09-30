@@ -836,25 +836,22 @@ As a sales manager, you are responsible for monitoring order health, bookings pe
 ### Bookings report
 
 ```bash
-crm analytics bookings --quarter Q1 --year 2026
-crm analytics bookings --quarter Q1 --year 2026 --format human
+crm bookings carr --format human
+crm bookings carr --from 2026-01-01 --to 2026-12-31 --period month --format human
+crm bookings deals --month 2026-07 --format human
 ```
 
-Shows bookings broken down by type: **new** (first-time orders), **renewal** (existing customer renewals), **expansion** (upsells and additional seats), and **contraction** (downsells and scope reductions). Each category shows ARR, deal count, and average deal size.
+`crm bookings carr` shows **contracted ARR (cARR)** per fiscal period: BoP, **new business**, **expansion** (upsells, contracted step-ups), **downsell** and **churn** (both negative), the net new ARR and EoP (= BoP + net = the next period's BoP), plus the fiscal-year box (gross new ARR, lost ARR, year to date). `crm bookings deals` lists the deal rows behind it, one per deal × movement, with ARR in the booking sheet's sense (a renewal row shows the run rate renewed; expansion, downsell and churn rows the signed change), MRR, churn trigger and lead source. Every figure's definition is served in `bookings_metric_definitions` of `/api/config/public`.
 
 Use this report in monthly revenue reviews to:
-- Track new business vs. renewal mix (target 60/40 for growth-stage companies)
+- Track the net new ARR against its parts — a net figure can hide a downsell or a churn
 - Identify expansion trends — growing expansion ARR signals strong product-market fit
-- Monitor contraction — rising contraction signals pricing or adoption issues that CS needs to address
-- Compare quarter-over-quarter bookings velocity to forecast accuracy
+- Monitor downsell and churn — rising numbers signal pricing or adoption issues that CS needs to address
+- Compare quarter-over-quarter net new ARR to forecast accuracy (`--as-known-at DATE` reproduces a past report)
 
 ```bash
-# Annual planning view — bookings are now reported per quarter (no arbitrary
-# date ranges), so request each quarter of the year separately and sum them.
-crm analytics bookings --quarter Q1 --year 2026 --format human
-crm analytics bookings --quarter Q2 --year 2026 --format human
-crm analytics bookings --quarter Q3 --year 2026 --format human
-crm analytics bookings --quarter Q4 --year 2026 --format human
+# Annual planning view — one table, a row per quarter, plus the FY box.
+crm bookings carr --from 2026-01-01 --to 2026-12-31 --period quarter --format human
 ```
 
 ### Renewal pipeline review

@@ -1085,8 +1085,9 @@ crm orders history ORDER_ID --format human
 ### Quarterly review with CS
 
 ```bash
-# Q1 bookings breakdown
-crm analytics bookings --quarter Q1 --year 2026 --format human
+# Contracted ARR by quarter for the fiscal year, and the deals behind Q1
+crm bookings carr --format human
+crm bookings deals --from 2026-01-01 --to 2026-03-31 --format human
 
 # Renewals due this quarter
 crm orders renewals-pipeline --days 90 --format human

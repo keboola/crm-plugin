@@ -73,7 +73,8 @@ with any state-changing step confirmed first.
 6. **Post-close revenue = Orders, not Contracts.** The `crm contracts`
    command was removed (ADR 2026-05-04 / #511). Use `crm orders …`
    (list/get/create/renew/amend/activate/history/renewals-pipeline) and
-   `crm analytics bookings [--quarter Qn --year YYYY]`. `orders renew`
+   `crm bookings carr` (contracted ARR per period) / `crm bookings deals` (one
+   row per deal × movement). `orders renew`
    and `orders amend` create a **draft** order (linked via
    `parent_order_id`) — it is not live until `crm orders activate <id>`.
    There is no `--new-arr`/`--term`/`--confirm`; use `--total` +
