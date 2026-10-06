@@ -19,7 +19,7 @@ The user wants to:
 - Highlight rows matching a condition ("flag Activity Center customers")
 - Chart something ("pipeline by stage", "ARR by quarter") — bar / line /
   donut / KPI
-- Pin a view or a dashboard to their menu
+- Pin a view or a dashboard to the top of its list (Saved Views / Dashboards)
 - Compose multiple views into a single dashboard ("daily standup view")
 - Iterate on an existing artefact ("make the highlight rose", "add a
   KPI for total ARR to that dashboard")
@@ -119,13 +119,15 @@ Phase 1), **ask before substituting**. Silent substitution erodes trust.
 
 ### Step 2 — Build a JSON file
 
-Compose a ``SavedViewCreateRequest`` matching the schema below.
+Compose a ``SavedViewCreateRequest`` matching the schema below. Leave
+``pin_mode`` (``literal`` / ``dynamic``) out: it is stored for the future
+sharing phase and has no effect today (views are owner-only), so do not offer
+the user a choice or promise per-viewer behaviour.
 
 ```json
 {
   "title": "LinkedIn opps · Balu (Activity Center)",
   "description": "Demo deals owned by Balu, highlighting accounts with Activity Center on.",
-  "pin_mode": "literal",
   "pinned": false,
   "spec": {
     "entity": "opportunity",
@@ -231,8 +233,7 @@ cat <<'JSON' | crm views create --from-file -
 JSON
 ```
 
-Or save to a file and ``crm views create --from-file my_view.json
---pin --pin-mode dynamic``.
+Or save to a file and ``crm views create --from-file my_view.json --pin``.
 
 ### Step 4 — Iterate
 
@@ -253,6 +254,10 @@ inside the docker network.)
 crm views pin $ID
 crm views export $ID --export-format csv -o my_view.csv
 ```
+
+Pinning lifts a view (or dashboard) into the "Pinned" group at the top of
+the Saved Views (or Dashboards) list. It does not add anything to the
+sidebar menu — do not tell the user it will appear there.
 
 ## Workflow B — composed dashboard (Phase 3)
 
