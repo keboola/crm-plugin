@@ -23,7 +23,7 @@ This skill activates when the user wants to:
 
 Determine which discount workflow the user needs:
 - **Submit Request** — Rep requesting a discount on a deal
-- **List Pending** — Manager viewing requests awaiting approval
+- **List Pending** — An approver viewing requests awaiting approval (approvers and holders of `discounts.read` see every request; anyone else only the ones they raised)
 - **Approve** — Approve a discount request
 - **Reject** — Reject a discount request with reason
 - **Policy Check** — Review discount thresholds and rules
