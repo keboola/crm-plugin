@@ -85,6 +85,19 @@ Map the deal timeline:
 crm opportunities close-lost <opportunity_id>
 ```
 
+**A deal that was Closed Won also cancels its Order.** Moving it to Closed
+Lost needs a `--change-reason`, and the server cancels the deal's active Order
+in the same step. It refuses the move until that cancellation is confirmed
+for that very order: check the order (number, id, effective date) and what its
+cancellation sets off with `crm opportunities stage-requirements
+<opportunity_id> --target-stage closed_lost`, tell the user, and only with
+their explicit yes pass `--cancel-order <the order id you showed>`. If the
+order was replaced in between, the command refuses — show the new one and ask
+again. Usually nothing is saved; if the order changed in the instant between
+the command's own check and the move, the Loss Analysis is already saved (the
+JSON error carries `loss_analysis_saved: true`) and a re-run updates it. Never
+confirm on their behalf.
+
 Provide the structured analysis with:
 - Primary loss reason (category)
 - Detailed loss narrative

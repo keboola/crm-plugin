@@ -868,9 +868,22 @@ crm opportunities close-lost OPP_ID
 crm opportunities close-lost OPP_ID \
   --reason competition \
   --competitor "Fivetran" \
+  --relationship nurture \
   --analysis "Lost due to existing Fivetran investment and strong IT champion. Should have engaged IT earlier in the cycle. Key lesson: involve infrastructure team by demo stage." \
   --confirm
 ```
+
+**Losing a deal that was already won** also cancels its active Order, and
+the server refuses the move until that cancellation is confirmed for that very
+order. First run `crm opportunities stage-requirements OPP_ID --target-stage
+closed_lost`: it shows the order (number, id, effective date) and what its
+cancellation sets off. Tell the user, and with their yes add
+`--change-reason "..."` and `--cancel-order <the order id you showed>`. If the
+deal's order was replaced meanwhile, the command refuses — show the user the
+new order and ask again. Usually it refuses before saving anything; if the
+order changed in the instant between its own check and the move, the Loss
+Analysis is already saved (the JSON error carries `loss_analysis_saved: true`)
+and a re-run updates it. Confirm only what the user agreed to.
 
 **Loss reason values:**
 | Key | Meaning |
