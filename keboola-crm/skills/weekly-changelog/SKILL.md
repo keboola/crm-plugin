@@ -147,4 +147,4 @@ default) and read the step summary.
   the Slack post and the `/releases#<date>` deep link.
 - `scripts/ci/changelog_announce.py` — decides which entries production now
   serves and nobody has announced (tested by `scripts/test_changelog_announce.py`
-  and `scripts/test_changelog_announce_workflow.py`).
+  and `scripts/test_changelog_announce.py`).
