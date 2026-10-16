@@ -532,7 +532,7 @@ Submits a discount approval request. `PERCENT` is a number (e.g. `15` for 15%). 
 - At or below the threshold: auto-approved, the opportunity ARR is updated immediately
 - Above the threshold: a pending request is created for manager review
 
-Line-item discounts (per-product `discount_percent` on the deal) use the separate config-driven tier ladder (`settings.discount_approval_tier_ceilings`): ≤15% Tier 1 — Sales Manager, 15–25% Tier 2 — CRO, >25% Tier 3 — CFO / Deal Desk (no upper cap, no auto-approval).
+Line-item discounts (per-product `discount_percent` on the deal) are legacy-only (GH #2099): a new line can no longer be given a non-zero discount_percent, though an already-discounted legacy line can still be re-priced. Discounting now goes through an order-level Discount line instead; the tier ladder below (`settings.discount_approval_tier_ceilings`: ≤15% Tier 1 — Sales Manager, 15–25% Tier 2 — CRO, >25% Tier 3 — CFO / Deal Desk, no upper cap, no auto-approval) only still applies to editing an existing legacy line.
 
 **Discount request workflow:**
 
