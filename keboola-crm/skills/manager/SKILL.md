@@ -119,9 +119,15 @@ crm forecast show --year 2026 --format human
 crm forecast show --year 2026 --period-type month --format human
 ```
 
-One table per owner plus a Company footer, showing Closed Won, Commit, Best Case and
-Pipeline against each owner's assigned target, with attainment, gap and coverage. Use
-it to spot reps behind plan and reps with coverage gaps.
+A set of tables per owner, a `Total` footer over those rows, then the org-wide
+"Whole company" tables. Each shows Closed Won, Commit, Best Case and Pipeline — four
+**mutually exclusive** categories, each deal in exactly one by its stage, so they add
+up rather than nest — against the assigned target, then Forecast (Closed Won +
+Commit), Att % (Closed Won ÷ Target), Gap (Target − Forecast) and Cov ((Commit + Best
+Case + Pipeline) ÷ (Target − Closed Won)), then the probability-weighted figures (Wtd
+Fcst = Closed Won + weighted Commit). Use it to spot reps behind plan and reps with
+coverage gaps; `crm forecast opportunities --year 2026 --category commit` lists the
+deals behind one category.
 
 Two readings to get right:
 

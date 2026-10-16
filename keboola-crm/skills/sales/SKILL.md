@@ -582,7 +582,10 @@ crm forecast show --year 2026 --period-type month --format human
 ```
 
 Shows Closed Won, Commit, Best Case and Pipeline against your assigned target for
-each period, plus attainment, gap and coverage.
+each period — four mutually exclusive categories, each deal in exactly one by its
+stage — plus Forecast (Closed Won + Commit), attainment, Gap (Target − Forecast),
+coverage and the probability-weighted figures. To see which deals make up one
+category: `crm forecast opportunities --year 2026 --category commit --format human`.
 
 A target shown as `—` means **nobody assigned one** — not zero. Do not report 0%
 attainment for such a period; the answer is that no target is set.

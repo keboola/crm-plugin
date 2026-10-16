@@ -64,18 +64,56 @@ order. The three `out:` markers are the understating cases above.
 crm forecast show --year 2026 --format human
 ```
 
-One table per owner plus a **`Total`** footer table, one row per fiscal period,
-with:
+A set of tables per owner, then the same set for the **`Total`** footer, then the
+**Whole company** tables. One row per fiscal period.
 
-- **Closed Won** — booked net-new ARR
-- **Commit** — won, plus high-probability deals that are **not stalled**
-- **Best Case** — probability-weighted; stalled deals contribute 0
-- **Pipeline** — every non-lost deal, unweighted, stalled **included**
+**The four categories are mutually exclusive.** Every non-lost deal sits in exactly
+ONE of them, decided by its **stage** (the server's stage → category map, served as
+`forecast_categories` on `/api/config/public`). Stalled deals stay in their stage's
+category. So the four columns add up to the whole book — Best Case does **not**
+include Commit, and Pipeline does **not** include the other three. Never add one
+category into another, and never describe Commit as "won plus committed" (that is
+**Forecast**).
+
+Money table:
+
+- **Closed Won** — booked net-new ARR (stage `closed_won`)
+- **Commit** — open deals in the Commit stage(s) (default: `offer_negotiation`)
+- **Best Case** — open deals in the Best Case stage(s) (default: `poc`)
+- **Pipeline** — open deals in the Pipeline stages (default: `discovery`, `demo`)
 - **Target** — the assigned number, or `—` when none is set
-- **Att %** — Closed Won ÷ Target
-- **Gap** — Target − Commit (negative means committed over target)
-- **Cov** — Pipeline ÷ remaining target; `—` once the target is met
+
+All four categories are **unweighted** sums of net-new ARR. Attainment table:
+
+- **Forecast** — Closed Won + Commit. Never `—`: it needs no target
+- **Att %** — Closed Won ÷ Target (won business only)
+- **Gap** — Target − Forecast (negative means the forecast is over target)
+- **Cov** — (Commit + Best Case + Pipeline) ÷ (Target − Closed Won): how many times
+  the open pipeline covers what is still to win; `—` once the target is met
 - **Unknown** — deals whose net-new ARR could not be determined
+
+Weighted table (each open deal × its stage probability; negatives weighted too):
+
+- **Wtd Commit / Wtd Best / Wtd Pipe** — `commit_weighted`, `best_case_weighted`,
+  `pipeline_weighted`
+- **Wtd Fcst** — Closed Won + Wtd Commit (`forecast_weighted`; won deals are certain,
+  so Closed Won is added unweighted)
+- **Wtd Gap** — Target − Wtd Fcst (`gap_to_target_weighted`)
+
+Every figure is computed server-side — quote it, do not recompute it. `--format json`
+carries all of them per cell, per aggregate and on `company.aggregate`.
+
+To see the deals behind one category, drill down with `--category` (repeatable;
+`closed_won`, `commit`, `best_case`, `pipeline`):
+
+```bash
+crm forecast opportunities --year 2026 --category commit --format human
+```
+
+Each row shows the deal's **Category**, its **ARR** and **Weighted ARR**. Summing ARR
+over one category reproduces that category's figure in `forecast show` (unless the
+listing says it is truncated); the **Grand total** line under the table is
+server-computed over the whole matching set.
 
 ### Three things about this grid that will mislead you if you skip them
 
@@ -115,8 +153,9 @@ it. The two are *expected* to differ whenever a deal belongs to an untargeted ow
 a filter is active; that difference is a fact about the book, so do not report it as an
 inconsistency and do not reconcile one against the other.
 
-- `company.aggregate` — the org's Closed Won / Commit / Best Case / Pipeline, plus the
-  separately-assigned **company** target and its attainment.
+- `company.aggregate` — the org's Closed Won / Commit / Best Case / Pipeline, their
+  weighted figures and Forecast, plus the separately-assigned **company** target and
+  its attainment, gap and coverage.
 - `company.over_assignment` — every assigned owner target minus the company target,
   paired per period. Positive means the individuals were deliberately given more than
   the company number, which is normal practice.
@@ -124,9 +163,10 @@ inconsistency and do not reconcile one against the other.
   you have no org figure at all — say so, rather than summing the visible rows and
   calling the result the company.
 
-**`crm forecast show --format human` does not print the company figure.** It prints the
-per-owner tables and the `Total` footer only. Use `--format json` when the question is
-about the organisation.
+**`crm forecast show --format human` prints the company figure too**, as the
+**Whole company** tables after the `Total` footer (money, attainment, weighted, and —
+under the default metric — the New Business / Expansion split and the target split).
+They are titled "Whole company", never "Total"; keep the two apart when you report.
 
 **When there are no rows, `--format human` prints the `empty_reason` explanation on
 STDOUT and no tables at all.** That is deliberate: every figure in them would be
@@ -213,9 +253,12 @@ Judge pace, not just the raw percentage: attainment of 45% halfway through a qua
 is on track; the same number with two weeks left is not. When you have both, state
 the comparison rather than the bare number.
 
-A stalled deal sitting in negotiation is deliberately **not** in Commit — that is the
-CRO's rule, not a data problem. If a rep asks why their Commit dropped, a newly
-stalled deal is the first thing to check.
+A stalled deal **stays** in its stage's category — stalling no longer moves a deal out
+of Commit. If a rep asks why their Commit dropped, check for deals that moved stage
+(back to `poc` drops them into Best Case; forward to `closed_won` moves them into Closed
+Won, which raises Forecast by nothing — the deal was already in it) or that slipped out
+of the period. `crm forecast opportunities --category commit` lists exactly the deals
+behind the figure.
 
 ## Related skills
 
