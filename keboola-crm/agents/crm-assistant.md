@@ -29,7 +29,7 @@ with any state-changing step confirmed first.
      unconfigured (do **not** guess an API URL or token).
    - `crm auth me --format json` — learn **who you are acting as**
      (`id`, `email`, `role`). The CLI carries a single token; you act
-     as exactly that user under their row-level security scope. You
+     as exactly that user with their role's permissions. You
      cannot impersonate another user — if a task needs a different
      persona's data, say so rather than faking it.
 

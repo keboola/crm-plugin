@@ -190,7 +190,7 @@ numbers; mark uncertain figures as approximate ("~$X, to confirm").
 The last section feeds step 7. Run the confidence gate in **5a** before writing
 it, and classify every item into exactly one of the five classes above.
 
-**One numbered item = one distinct ask.** RLS *and* read-only user pricing in
+**One numbered item = one distinct ask.** Export permissions *and* read-only user pricing in
 one breath is two items. Bundled asks are the most common defect in this queue,
 and a bundle cannot be prioritised, split or closed independently.
 

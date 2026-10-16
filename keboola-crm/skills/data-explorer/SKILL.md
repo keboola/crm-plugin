@@ -83,7 +83,7 @@ Returns:
 curl -s "$BASE_URL/api/views/samples?entity=opportunity&n=10" | jq
 ```
 
-Returns 10 RLS-checked recent rows with the analytics-relevant fields
+Returns 10 recent rows with the analytics-relevant fields
 filled in (no PII, no MEDDPICC narratives). Use this to ground enum
 values: if the catalog says ``account.industry`` is a free-text
 string, samples will tell you the actual industry strings in the data
