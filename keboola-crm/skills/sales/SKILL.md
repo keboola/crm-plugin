@@ -1059,8 +1059,10 @@ crm orders activate ORDER_ID --client-signed-at YYYY-MM-DD --format human
 ```bash
 crm opportunities get OPP_ID   # get account_id and amount
 
+# --opportunity is required. The order currency is the catalog base currency
+# (set by the backend). Renewals/amendments use `crm orders renew|amend`, never `create`.
 crm orders create --account ACCOUNT_ID --opportunity OPP_ID \
-  --total <opportunity amount> --start-date <today> --end-date <YYYY-MM-DD> --format human
+  --effective <YYYY-MM-DD> --format human   # add --length <months> if the opportunity has no end date
 ```
 
 ### Renewal workflow (at deal close time, coordinate with CS)
