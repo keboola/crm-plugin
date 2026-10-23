@@ -1,6 +1,6 @@
 ---
 name: discount-approval
-description: Manage discount request and approval workflows — submit discount requests with justification, list pending requests, approve or reject with notes, and apply the config-driven thresholds (opportunity-level requests auto-approve at or below the configured threshold, default 10%; line-item discounts route through approval tiers Tier 1 ≤15% / Tier 2 ≤25% / Tier 3 above). Activates when users need to request, review, or approve discounts on opportunities.
+description: Manage discount request and approval workflows — submit discount requests with justification, list pending requests, approve or reject with notes, and apply the config-driven thresholds (opportunity-level requests auto-approve at or below the configured threshold; line-item discounts roll up into one aggregate request per opportunity, proposal or order, routed to the approval tier its configured ceilings give). Activates when users need to request, review, or approve discounts on opportunities.
 allowed-tools: ['Bash']
 ---
 
@@ -51,13 +51,35 @@ The request must include:
 
 ### Step 3: Discount Approval Thresholds
 
-Discounts require different approval levels based on the percentage:
+Discounts require different approval levels based on the percentage. The
+ceilings are configuration (`discount_approval_tier_ceilings`, served by
+`/api/config/public`) — read them there, never quote a number from memory:
 
 | Discount Level | Approver Tier | Typical Justification |
 |---------------|---------------|----------------------|
-| ≤ 15% (config: discount_approval_tier_ceilings.tier_1) | Tier 1 — Sales Manager | Competitive pressure, multi-year deal |
-| 15–25% (config: discount_approval_tier_ceilings.tier_2) | Tier 2 — CRO | Strategic account, market entry, large deal |
-| > 25% | Tier 3 — CFO / Deal Desk | Exceptional circumstances, executive-level commitment |
+| up to the Tier 1 ceiling | Tier 1 — Sales Manager | Competitive pressure, multi-year deal |
+| up to the Tier 2 ceiling | Tier 2 — CRO | Strategic account, market entry, large deal |
+| above it (uncapped) | Tier 3 — CFO / Deal Desk | Exceptional circumstances, executive-level commitment |
+
+**Line-item discounts (KIDS-541).** A discount on an individual line is entered
+as an **amount** for the line's Amount period (per month on a recurring line,
+the whole line on a one-off); the CRM derives and stores the percent, and a
+later quantity / price change keeps the percent. All discounted lines of one
+parent share ONE aggregate `line_items` request, sized on the drop in total
+contract value and always queued (no auto-approve):
+
+- **Parent.** An opportunity, an order, or a **proposal** — each draft / sent
+  proposal of a deal raises its own request on save (`proposal_id` set,
+  listed as "Opportunity · Proposal N"). Only the synced proposal's pending
+  request blocks Closed Won; an alternative quote's blocks nothing. A proposal
+  saved before this rule has none: use **Request approval** on its card.
+- **Hand-over.** Accepting a proposal moves its approved request to the order
+  (still `proposal_id` as provenance); Revert Acceptance moves it back.
+- **Raising an approved discount** parks the approval as `superseded` beside a
+  new pending request (`replaces_approval_id` / `replaced_by_id` link them).
+  Approving the raise retires the parked approval; rejecting it restores the
+  previously approved line discounts. A `superseded` row gates nothing.
+- **Rejecting a first request** resets the parent's discounted lines to 0 %.
 
 **Important rules:**
 - **No upper cap.** Every discount routes through the approval queue regardless of size — the Tier 3 (CFO / Deal Desk) approver can sign off on any discount the rep can justify. The earlier 50% hard reject was dropped per the deal-desk feedback round.
@@ -138,7 +160,7 @@ After any discount action, summarize:
 ## Related RoE Rules
 
 - **Minimum ACV after discount**: $70K for Core, $75K for Strategic, $200K for Enterprise
-- **Approval chain**: two config-driven flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below 10% (config: discount_approval_threshold_percent) and create a pending request for manager review above it. Line-item discounts route through the tier ladder `settings.discount_approval_tier_ceilings` — Tier 1 (Sales Manager) ≤15%, Tier 2 (CRO) 15–25%, Tier 3 (CFO / Deal Desk) >25% with no upper cap and no auto-approval. Trust the live config over this line.
+- **Approval chain**: two config-driven flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below the configured `discount_approval_threshold_percent` and create a pending request for manager review above it. Line-item discounts route through the tier ladder `discount_approval_tier_ceilings` — Tier 1 (Sales Manager), Tier 2 (CRO), Tier 3 (CFO / Deal Desk) with no upper cap and no auto-approval. Read the live ceilings from `/api/config/public`.
 - **A discount cannot exceed the price**: `crm discounts request` rejects a percentage above 100 with a 422 (#1104). "No upper cap" above is about *who approves* a deep discount, not about how large the number may be — at 100% the customer pays nothing, and beyond that we would be paying them. If a rep asks for more than 100%, they are describing something else (a credit, a rebate, a negative line item) — clarify what they mean rather than retrying the request.
 - **Multi-year offset**: 3-year commitment grants +5% discount flexibility
 - **No retroactive discounts**: Discounts apply to new/renewal terms only
