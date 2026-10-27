@@ -65,6 +65,7 @@ crm opportunities create
 ```
 
 Set:
+- Type: **always pass `--opportunity-type`** (a code from `enums.opportunity_type` of `/api/config/public`; the command refuses to run without it unless `--predecessor-order` / `--amended-order` implies it, and the API rejects a type-less opportunity)
 - Stage: **Discovery** (all new opportunities start here)
 - Probability: **20%**
 - Link to the correct account
@@ -101,7 +102,7 @@ Present a summary to the user:
 ## Validation Rules
 
 - **ACV minimum**: $70K RoE guidance for any opportunity — flag if below. The API rejects below-floor amounts only when the configured floor (`thresholds.min_deal_size_arr` in `/api/config/public`) is greater than 0; the default is 0 (floor disabled), so never claim an unconditional hard block (#910).
-- **Stage**: Always starts at Discovery (20%).
+- **Stage**: Always starts at its type's entry stage (`opportunity_type_stages` in `/api/config/public` — Discovery for New Business; Existing-Business types skip ahead). The API refuses any later open stage on create (`create_stage_not_entry`); advance with `crm opportunities update-stage`, where the gates apply. Only an admin may create a deal directly in Closed Won / Closed Lost (backfill).
 - **Territory**: Auto-assigned based on account HQ country.
 - **MEDDPICC**: All 8 components should have at least placeholder entries.
 - **Close date**: Should be realistic (typically 3-9 months from Discovery).

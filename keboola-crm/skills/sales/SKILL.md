@@ -250,10 +250,10 @@ Full opportunity detail: MEDDPICC fields, stage history, activities, contacts, f
 #### Create opportunity
 
 ```bash
-crm opportunities create ACCOUNT_ID NAME
+crm opportunities create --account ACCOUNT_ID --name NAME --opportunity-type TYPE
 ```
 
-Creates a new opportunity against an account. You will be prompted for ARR, close date, and initial stage.
+Creates a new opportunity against an account. You will be prompted for ARR and close date. The deal starts at its type's entry stage; a later stage is reached with `update-stage` (the API refuses it on create, except an admin backfilling Closed Won / Closed Lost).
 
 #### Qualify opportunity (MEDDPICC review)
 
@@ -721,7 +721,7 @@ crm accounts search "Acme"
 crm accounts create "Acme Corp"
 
 # 4. Create the opportunity
-crm opportunities create ACCOUNT_ID "Acme — Platform Modernization"
+crm opportunities create --account ACCOUNT_ID --name "Acme — Platform Modernization" --opportunity-type TYPE
 
 # 5. Start qualification immediately
 crm opportunities qualify OPP_ID
@@ -984,7 +984,7 @@ Steps:
 
 If no existing account:
 4. crm accounts create "Alza.cz"       — create account in correct territory
-5. crm opportunities create ACCOUNT_ID "Alza — Data Platform"
+5. crm opportunities create --account ACCOUNT_ID --name "Alza — Data Platform" --opportunity-type TYPE
 6. crm opportunities qualify OPP_ID    — start MEDDPICC qualification
 ```
 
