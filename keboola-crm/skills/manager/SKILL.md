@@ -847,7 +847,7 @@ crm bookings carr --from 2026-01-01 --to 2026-12-31 --period month --format huma
 crm bookings deals --month 2026-07 --format human
 ```
 
-`crm bookings carr` shows **contracted ARR (cARR)** per fiscal period: BoP, **new business**, **expansion** (upsells, contracted step-ups), **downsell** and **churn** (both negative), the net new ARR and EoP (= BoP + net = the next period's BoP), plus the fiscal-year box (gross new ARR, lost ARR, year to date). `crm bookings deals` lists the deal rows behind it, one per deal × movement, with ARR in the booking sheet's sense (a renewal row shows the run rate renewed; expansion, downsell and churn rows the signed change), MRR, churn trigger and lead source. Every figure's definition is served in `bookings_metric_definitions` of `/api/config/public`.
+`crm bookings carr` shows **contracted ARR (cARR)** per fiscal period: cARR BoP, **new business**, **expansion** (upsells, contracted step-ups), **downsell** and **churn** (both negative), **Attainment** (their sum — the net change to cARR, not attainment against a target), cARR EoP (= BoP + Attainment = the next period's BoP) and cNRR (one-off value, never in cARR), plus the fiscal-year box (gross new, lost, year to date). `crm bookings deals` lists the deal rows behind it — one netted row per deal at its final rate, typed by its net change — with Type, cARR (the contract after the deal), New cARR, cNRR, churn trigger and lead source; `--sort-by` / `--sort-dir` order them. Every figure's definition is served in `bookings_metric_definitions` of `/api/config/public`.
 
 Use this report in monthly revenue reviews to:
 - Track the net new ARR against its parts — a net figure can hide a downsell or a churn

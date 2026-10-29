@@ -149,14 +149,15 @@ Scope the report with `--from` / `--to` and `--period month|quarter|fy`, e.g.
 `crm bookings carr --from 2026-01-01 --to 2026-03-31`.
 
 `crm bookings carr` shows contracted ARR per fiscal period:
-- BoP and EoP (EoP of one period is BoP of the next)
+- cARR BoP and cARR EoP (EoP of one period is BoP of the next)
 - New business (new logos)
 - Expansion (upsells, amendments, contracted step-ups)
 - Downsell and churn (negative)
-- Net new ARR, and the fiscal-year box with year to date
+- Attainment (the four movements' sum — not against a target), cNRR (one-off
+  value, never in cARR), and the fiscal-year box with year to date
 
-`crm bookings deals` lists one row per deal × movement — including the renewal
-rows, which change no ARR but show the run rate renewed.
+`crm bookings deals` lists one netted row per deal, at its final rate — a flat
+renewal is a Renewal row with New cARR 0 and the contract's cARR.
 
 ## Related RoE Rules
 
