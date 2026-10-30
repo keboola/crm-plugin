@@ -24,7 +24,6 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 | `deal-review` | `/deal-review` | Comprehensive deal review before stage gate |
 | `loss-analysis` | `/loss-analysis` | Capture structured loss analysis for lost deals |
 | `prep-meeting` | `/prep-meeting` | Prepare for customer meeting with full context |
-| `contract-management` | `/contract-management` | Manage contracts — create, renew, amend, history chain, bookings |
 | `invoice-management` | `/invoice-management` | Manage invoices — create, send, payments, aging, credit notes |
 | `forecast-attainment` | `/forecast-attainment` | Track attainment against assigned targets and pipeline coverage |
 | `territory-management` | `/territory-management` | Manage territories — assignments, reassignment, auto-assign |
@@ -34,7 +33,7 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 | `revenue-analytics` | `/revenue-analytics` | Revenue analytics — ARR, waterfall, NRR, cohorts, dashboard |
 | `alerts-triage` | `/alerts-triage` | Triage alerts — list, acknowledge, summary, daily routine |
 | `log-activity` | `/log-activity` | Capture a great activity record — log/edit a meeting or call, record people met (`--met`, auto-links to contacts), set the real date (`--at`), correct in place, link attendees |
-| `gong-transcript-import` | `/gong-transcript-import` | Import call transcripts — Gong / Plaud / manual, bulk import, MEDDPICC extraction |
+| `plaud-crm-call-import` | `/plaud-crm-call-import` | Import a Plaud recording as a `call` activity — transcript download, account/opportunity match, calendar attendees, fixed 7-section English write-up |
 | `architecture-brief` | `/architecture-brief` | Engineering, **monorepo only** (excluded from the public marketplace build): produce a structured brief (affected modules, files to open, cross-cutting concerns, related ADRs, testing strategy) for a CRM coding task. Pass an issue number or module name. |
 
 ## Prerequisites
@@ -121,9 +120,6 @@ All skills are namespaced: `/keboola-crm:<skill-name>`.
 
 # Prepare for meeting
 /prep-meeting I have a call with Acme Corp tomorrow at 2pm
-
-# Contract management
-/contract-management Renew contract 15 with a 10% price increase
 
 # Invoice management
 /invoice-management Show unpaid invoices for Acme Corp

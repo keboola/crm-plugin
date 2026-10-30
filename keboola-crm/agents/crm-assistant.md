@@ -108,7 +108,7 @@ specific):
 | capture why a deal was lost | `loss-analysis` |
 | prep for a specific meeting | `prep-meeting` |
 | research / enrich an account | `account-research`, `account-enrichment` |
-| manage post-close orders / renewals | `contract-management` *(orders-based)* |
+| manage post-close orders / renewals | `cs` (renewals), `sales` *(orders-based: `crm orders renew|amend|history`)* |
 | invoices, billing, payments | `invoice-management` |
 | target attainment / coverage | `forecast-attainment` |
 | territories, assignments | `territory-management` |
@@ -117,7 +117,7 @@ specific):
 | ARR / waterfall / NRR / cohorts | `revenue-analytics` |
 | triage CRM alerts | `alerts-triage` |
 | log a meeting/call, record who we met, fix an activity's date | `log-activity` |
-| import a call transcript | `gong-transcript-import` |
+| import a call transcript | `plaud-crm-call-import` |
 
 If no skill matches, fall back to the persona skill's general guidance
 and the raw `crm` CLI (`crm --help`, `crm <group> --help`).
