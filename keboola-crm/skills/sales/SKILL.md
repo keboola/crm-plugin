@@ -89,9 +89,10 @@ crm alerts list
 crm alerts list --severity critical
 crm alerts list --severity high
 crm alerts list --severity medium
-crm alerts list --severity low
 crm alerts list --unacknowledged
 ```
+
+By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
 
 Lists CRM alerts such as: close date overdue, no champion identified, missing economic buyer, stuck in stage, contract risk signals. Filter by severity to triage quickly. Always resolve `--severity critical` alerts first.
 
@@ -109,7 +110,6 @@ Lists CRM alerts such as: close date overdue, no champion identified, missing ec
 1. Run `crm alerts list --severity critical` — resolve these today, no exceptions
 2. Run `crm alerts list --severity high` — plan action this week
 3. Run `crm alerts list --severity medium` — address during weekly pipeline review
-4. Run `crm alerts list --severity low` — informational, batch-process weekly
 
 #### Acknowledge an alert
 

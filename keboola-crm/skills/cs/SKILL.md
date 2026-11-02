@@ -409,15 +409,17 @@ Lists deals and accounts without logged activity in the last 14 days. From a CS 
 #### Account alerts
 
 ```bash
-crm alerts list                                    # default = unacknowledged
+crm alerts list                                    # default = unacknowledged, addressed to you
 crm alerts list --severity critical
 crm alerts list --severity high
-crm alerts list --type checkin_overdue             # CSM-relevant alert type
-crm alerts list --alert-type usage_threshold
+crm alerts list --type account_reassignment        # CSM-relevant alert type
+crm alerts list --object-type account --object-id <account_id>  # every alert on one account
 crm alerts list --all --format human               # include acknowledged
 ```
 
-A dedicated `--for-csm` preset (a single flag that bundles the CSM-relevant alert types) is requested by the CSM audit but not yet exposed by `GET /api/alerts` (see the NOTE block in `crm alerts list --help`). For now, filter by the relevant `--alert-type` value individually: `checkin_overdue`, `usage_threshold`, `eb_engagement_stale`, `stalled`, etc.
+By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
+
+A dedicated `--for-csm` preset (a single flag that bundles the CSM-relevant alert types) is requested by the CSM audit but not yet exposed by `GET /api/alerts` (see the NOTE block in `crm alerts list --help`). For now, filter by the relevant `--alert-type` value individually: `account_reassignment`, `eb_engagement_stale`, `stalled`, etc.
 
 #### Acknowledge alerts
 

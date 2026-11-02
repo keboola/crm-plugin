@@ -391,12 +391,13 @@ Run with a rep during coaching sessions to walk through MEDDPICC gaps together.
 ### Alerts
 
 ```bash
-crm alerts list
-crm alerts list --severity critical
-crm alerts list --unacknowledged
+crm alerts list                        # alerts addressed to you (or your role)
+crm alerts list --scope all            # every alert (manager / vp / revops / admin)
+crm alerts list --scope all --severity critical
+crm alerts list --scope all --unacknowledged
 ```
 
-Alerts across all team accounts. Critical alerts require immediate manager attention: overdue close dates on large deals, no champion on deals in Proposal or later, no Economic Buyer on deals > 90 days old.
+By default you see only alerts addressed to you; `--scope all` widens it to every alert. The legacy detection rules (stalled deals, missing champion / Economic Buyer, close-date risk, ...) are off unless an administrator enables them on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill, and check the pipeline (`crm pipeline health`) rather than reading "no alerts" as "no risk". When those rules are enabled, critical alerts deserve same-day manager attention.
 
 #### Alert summary by severity
 
@@ -404,7 +405,7 @@ Alerts across all team accounts. Critical alerts require immediate manager atten
 crm alerts summary
 ```
 
-Shows a summary count of alerts grouped by severity (critical, high, medium, low) and by type (stalled, no_followup, close_date_risk, etc.). Use this for a quick daily triage to understand the overall alert landscape before diving into individual alerts. The summary view is faster than scrolling through the full alert list when you manage a large team.
+Shows a summary count of alerts addressed to you (`--scope all` for everyone's) grouped by severity (critical, high, medium) and by type (stalled, no_followup, close_date_risk, etc.). Use this for a quick daily triage to understand the overall alert landscape before diving into individual alerts. The summary view is faster than scrolling through the full alert list when you manage a large team.
 
 ---
 
@@ -427,8 +428,8 @@ crm reports stale
 # 4. Quota coverage check
 crm forecast show --year 2026
 
-# 5. Critical alerts needing attention
-crm alerts list --severity critical
+# 5. Critical alerts needing attention (empty is normal: legacy rules are off by default)
+crm alerts list --scope all --severity critical
 
 # 6. Pending discount approvals
 crm discounts list --status pending
@@ -516,7 +517,7 @@ crm forecast show --year 2026
 crm reports win-loss
 
 # 4. Flag any large deals in commit that have issues
-crm alerts list --severity critical
+crm alerts list --scope all --severity critical
 ```
 
 Build the forecast narrative:
@@ -740,7 +741,7 @@ Steps:
 2. crm pipeline health         — systemic issues to address
 3. crm forecast show --year 2026 — who is behind plan?
 4. crm reports stale           — activity hygiene issues
-5. crm alerts list --severity critical  — fires to put out today
+5. crm alerts list --scope all --severity critical  — fires to put out today
 6. crm discounts list --status pending  — approvals to process
 
 Output: Summary of team pipeline, top 3 at-risk deals, reps below 3x coverage,
@@ -781,7 +782,7 @@ Steps:
 1. crm pipeline forecast        — commit / best case / pipeline totals
 2. crm forecast show --year 2026  — attainment per rep, total team
 3. crm reports win-loss         — win rate trends to contextualize the forecast
-4. crm alerts list --severity critical  — any large deals at risk?
+4. crm alerts list --scope all --severity critical  — any large deals at risk?
 
 Narrative to prepare:
 - Q2 commit: $X with Y deals (list the anchor deals)

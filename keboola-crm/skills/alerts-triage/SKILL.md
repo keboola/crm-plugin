@@ -32,17 +32,23 @@ Determine which alert workflow the user needs:
 ### Step 2: List Alerts by Severity
 
 ```bash
-crm alerts list                                    # default = unacknowledged
+crm alerts list                                    # default = unacknowledged, addressed to me
 crm alerts list --severity critical
 crm alerts list --severity high
 crm alerts list --type stalled
-crm alerts list --alert-type checkin_overdue       # alias of --type
+crm alerts list --alert-type no_followup           # alias of --type
 crm alerts list --all --format human               # include already acknowledged
+crm alerts list --scope all                        # everyone's alerts (manager/vp/revops/admin; others get 403)
+crm alerts list --object-type opportunity --object-id <opp_id>  # every alert on one object
 ```
 
-`--type` (or its alias `--alert-type`) accepts a single value per call. Common CSM-relevant types: `checkin_overdue`, `usage_threshold`, `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`. To triage a specific category for a CSM book, run e.g. `crm alerts list --type checkin_overdue --format human`.
+**Who sees what (#2265):** by default an alert list, summary and `ack-all` cover only alerts addressed to the current user — directly, or through their role (e.g. a `cro` audience alert reaches the role mapped to it in server config). `--scope all` is for management roles. `--object-type` + `--object-id` lists every alert on one opportunity, account or order for anyone. Acknowledging an alert not addressed to you returns 404 unless you hold a management role.
 
-A bundled `--for-csm` preset (one flag, multiple types) and a repeatable `--alert-type` (multiple types in one call) are requested by the CSM audit but not yet exposed by `GET /api/alerts` — see the NOTE block in `crm alerts list --help`. Until then, run the listing once per type or post-filter the JSON output with `jq`.
+**Legacy detection rules are off by default.** The scheduled rules (stalled, no_followup, incomplete_meddpicc, ...) run only when an administrator lists their type in the server's `ALERT_ENABLED_TYPES`, and those legacy alerts are addressed to nobody — they show only under `--scope all` or object-scoped. An empty list is therefore normal; do not tell the user "everything is healthy" from an empty alert list — check the pipeline too (Step 5d).
+
+`--type` (or its alias `--alert-type`) accepts a single value per call. Known rule types include `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`.
+
+A bundled `--for-csm` preset (one flag, multiple types) is requested by the CSM audit but not exposed by `GET /api/alerts` — see the NOTE block in `crm alerts list --help`. Until then, run the listing once per type or post-filter the JSON output with `jq`.
 
 Alerts are categorized by severity:
 
@@ -51,7 +57,6 @@ Alerts are categorized by severity:
 | **Critical** | Immediate action required — deal at risk, major issue | Same day |
 | **High** | Important — needs attention within 24-48 hours | 1-2 days |
 | **Medium** | Notable — should be addressed this week | This week |
-| **Low** | Informational — review when convenient | As needed |
 
 For each alert, note:
 - Alert ID, type, severity
@@ -79,7 +84,7 @@ crm alerts summary
 ```
 
 The summary provides:
-- **Total active alerts** by severity (Critical, High, Medium, Low)
+- **Total active alerts** by severity (Critical, High, Medium) addressed to you (`--scope all` for everyone's)
 - **Alert trends**: Are alerts increasing or decreasing?
 - **Top alert types**: Which categories generate the most alerts
 - **Oldest unacknowledged**: Alerts that have been waiting longest
