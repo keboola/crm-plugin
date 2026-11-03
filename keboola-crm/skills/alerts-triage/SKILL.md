@@ -46,7 +46,9 @@ crm alerts list --object-type opportunity --object-id <opp_id>  # every alert on
 
 **Legacy detection rules are off by default.** The scheduled rules (stalled, no_followup, incomplete_meddpicc, ...) run only when an administrator lists their type in the server's `ALERT_ENABLED_TYPES`, and those legacy alerts are addressed to nobody — they show only under `--scope all` or object-scoped. An empty list is therefore normal; do not tell the user "everything is healthy" from an empty alert list — check the pipeline too (Step 5d).
 
-`--type` (or its alias `--alert-type`) accepts a single value per call. Known rule types include `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`.
+**CRO change alerts (#2267).** Three event alerts are raised the moment someone changes an opportunity, addressed to the `cro` audience: `close_date_pushed` (close date moved later at a CRO-watch stage — Offer & Negotiation by default; carries the reason the person had to give), `arr_decreased` (ARR dropped by more than the configured percentage at a watch stage) and `stage_regressed` (any backward stage move, with the reason and whether a manager override was used). They are deduplicated to one alert per opportunity, type and day — further changes the same day are appended to that alert's `details.events`. Like every rule they run only when listed in `ALERT_ENABLED_TYPES`. To see the full trail behind one, run `crm opportunities change-log <opp_id>` (who changed stage / close date / ARR, how they authenticated, and why).
+
+`--type` (or its alias `--alert-type`) accepts a single value per call. Known rule types include `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`, and the CRO change alerts `close_date_pushed`, `arr_decreased`, `stage_regressed`.
 
 A bundled `--for-csm` preset (one flag, multiple types) is requested by the CSM audit but not exposed by `GET /api/alerts` — see the NOTE block in `crm alerts list --help`. Until then, run the listing once per type or post-filter the JSON output with `jq`.
 
@@ -159,6 +161,9 @@ Common CRM alert types and recommended actions:
 | **Low Pipeline Coverage** | Pipeline coverage below 2x quota gap | Increase prospecting activity |
 | **Large Deal Risk** | High-ACV deal showing risk indicators | Conduct deal review |
 | **Activity Drop** | Significant decrease in account activity | Re-engage customer contacts |
+| **Close Date Pushed** (`close_date_pushed`, CRO) | Close date moved later at a watch stage | Read the reason in the alert; check `crm opportunities change-log` for a pattern of slips |
+| **ARR Decreased** (`arr_decreased`, CRO) | ARR dropped by more than the configured percentage at a watch stage | Ask the owner what was removed or discounted |
+| **Stage Regressed** (`stage_regressed`, CRO) | Deal moved back a stage (reason given; manager override flagged) | Review the reason with the owner |
 
 ## Related RoE Rules
 
