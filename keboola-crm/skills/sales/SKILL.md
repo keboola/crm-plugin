@@ -89,7 +89,7 @@ crm alerts list
 crm alerts list --severity critical
 crm alerts list --severity high
 crm alerts list --severity medium
-crm alerts list --unacknowledged
+crm alerts list
 ```
 
 By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
@@ -111,13 +111,13 @@ Lists CRM alerts such as: close date overdue, no champion identified, missing ec
 2. Run `crm alerts list --severity high` — plan action this week
 3. Run `crm alerts list --severity medium` — address during weekly pipeline review
 
-#### Acknowledge an alert
+#### Resolve an alert
 
 ```bash
-crm alerts ack ALERT_ID
+crm alerts resolve ALERT_ID
 ```
 
-Marks an alert as acknowledged once you have taken action. Use the `id` field from `crm alerts list` output.
+Resolves an alert you accept as it is — for everyone it goes to; only its recipients may. Use the `id` field from `crm alerts list` output; `crm alerts reopen ALERT_ID` undoes it.
 
 ---
 
@@ -611,7 +611,7 @@ Run the full meeting prep sequence at least 30 minutes before any customer call:
 crm meetings prep ACCOUNT_NAME
 
 # 2. Check for any open alerts on this account
-crm alerts list --unacknowledged
+crm alerts list
 
 # 3. If a competitor is involved — get the battlecard
 crm battlecards list --competitor COMPETITOR_NAME
@@ -638,9 +638,9 @@ crm activities update ACTIVITY_ID \
   --met "Petra Dvořák <petra@firma.cz>:met" \
   --at "2026-07-08 10:00"     # only if the meeting wasn't today
 
-# 2. Acknowledge any alerts that were addressed
-crm alerts list --unacknowledged
-crm alerts ack ALERT_ID
+# 2. Resolve any alerts you accept as they are (fixing the deal clears condition alerts)
+crm alerts list
+crm alerts resolve ALERT_ID
 
 # 3. If MEDDPICC was updated — re-qualify
 crm opportunities qualify OPP_ID
@@ -670,8 +670,8 @@ crm pipeline health
 # 3. Deals without recent activity
 crm reports stale
 
-# 4. Unacknowledged alerts — sorted by severity
-crm alerts list --unacknowledged
+# 4. Open alerts — sorted by severity
+crm alerts list
 
 # 5. My full deal list
 crm reports my-deals
@@ -936,7 +936,7 @@ Steps:
 1. crm meetings prep "Rohlik"
    — Shows: account health, open opps, contacts, recent activities, MEDDPICC gaps, talking points
 
-2. crm alerts list --unacknowledged
+2. crm alerts list
    — Any alerts specific to this account?
 
 3. crm battlecards list

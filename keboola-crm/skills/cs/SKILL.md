@@ -409,25 +409,25 @@ Lists deals and accounts without logged activity in the last 14 days. From a CS 
 #### Account alerts
 
 ```bash
-crm alerts list                                    # default = unacknowledged, addressed to you
+crm alerts list                                    # default = open, routed to you
 crm alerts list --severity critical
 crm alerts list --severity high
 crm alerts list --type account_reassignment        # CSM-relevant alert type
 crm alerts list --object-type account --object-id <account_id>  # every alert on one account
-crm alerts list --all --format human               # include acknowledged
+crm alerts list --all --format human               # include resolved and cleared
 ```
 
-By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
+By default `crm alerts list` / `summary` cover only alerts routed to you (your role, or you as the record's owner, per the alert type's routing); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
 
 A dedicated `--for-csm` preset (a single flag that bundles the CSM-relevant alert types) is requested by the CSM audit but not yet exposed by `GET /api/alerts` (see the NOTE block in `crm alerts list --help`). For now, filter by the relevant `--alert-type` value individually: `account_reassignment`, `eb_engagement_stale`, `stalled`, etc.
 
-#### Acknowledge alerts
+#### Resolve alerts
 
 ```bash
-crm alerts ack ALERT_ID
+crm alerts resolve ALERT_ID
 ```
 
-Mark an alert as acknowledged after taking action. Use the `id` field from `crm alerts list`.
+Resolve an alert you accept as it is (for everyone it goes to; only its recipients may). Use the `id` field from `crm alerts list`; `crm alerts reopen ALERT_ID` undoes it.
 
 ---
 
@@ -559,7 +559,7 @@ crm opportunities list --account ACCOUNT_ID
 crm accounts telemetry-list ACCOUNT_ID
 
 # Step 7: Check for any existing alerts on this account
-crm alerts list --unacknowledged
+crm alerts list
 
 # Step 8: Create the structured onboarding plan and journey
 crm onboarding create ACCOUNT_ID
@@ -581,10 +581,10 @@ Run weekly across your entire book of business:
 
 ```bash
 # 1. Critical alerts in the CSM scope first
-crm alerts list --severity critical --unacknowledged
+crm alerts list --severity critical
 
 # 2. High severity alerts
-crm alerts list --severity high --unacknowledged
+crm alerts list --severity high
 
 # 3. Accounts with no recent activity
 crm reports stale
@@ -631,7 +631,7 @@ crm handovers brief OPP_ID
 crm contacts list --account-id ACCOUNT_ID
 
 # 8. Any open alerts on this account
-crm alerts list --unacknowledged
+crm alerts list
 
 # 9. Recent activity timeline (last 90 days)
 crm activities list --account-id ACCOUNT_ID --since "90 days ago"
@@ -678,7 +678,7 @@ Run monthly as part of renewal pipeline hygiene:
 crm reports forecast
 
 # 2. Critical CSM alerts — any renewal deals with risk signals
-crm alerts list --severity critical --unacknowledged
+crm alerts list --severity critical
 
 # 3. Orders expiring within 90 days
 crm orders renewals-pipeline --days 90 --format human
@@ -790,7 +790,7 @@ Steps:
 6. crm opportunities list --account ACCOUNT_ID
    — Are there other deals or historical context at this account?
 
-7. crm alerts list --unacknowledged
+7. crm alerts list
    — Any existing CSM-scope alerts I need to know about?
 
 8. crm onboarding create ACCOUNT_ID
@@ -816,10 +816,10 @@ User: Run my weekly account health check.
 Steps:
 0. ME=$(crm auth me | jq -r .id)   # capture user ID once
 
-1. crm alerts list --severity critical --unacknowledged
+1. crm alerts list --severity critical
    — Any critical CSM-scope alerts requiring immediate action?
 
-2. crm alerts list --severity high --unacknowledged
+2. crm alerts list --severity high
    — High severity items to address this week
 
 3. crm reports stale
@@ -871,7 +871,7 @@ Steps:
 8. crm activities list --account-id ACCOUNT_ID --since "90 days ago"
    — Recent interaction history to anchor the conversation
 
-9. crm alerts list --unacknowledged
+9. crm alerts list
    — Any open issues to address in the QBR?
 
 10. Schedule the QBR record:
@@ -923,7 +923,7 @@ Steps:
 8. crm activities list --account-id ACCOUNT_ID --since "60 days ago"
    — Has there been an executive touchpoint in the last 60 days?
 
-9. crm alerts list --unacknowledged
+9. crm alerts list
    — Any existing risk signals on this account?
 
 10. crm contacts list --account-id ACCOUNT_ID --role champion

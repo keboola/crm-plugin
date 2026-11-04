@@ -1,6 +1,6 @@
 ---
 name: alerts-triage
-description: Triage and manage CRM alerts — list alerts by severity, acknowledge alerts, view summary statistics, run a daily triage routine, and reference alert type definitions. Activates when users need to review, acknowledge, or triage CRM alerts.
+description: Triage and manage CRM alerts — list alerts by severity, resolve or reopen alerts, view summary statistics, see who each alert type goes to, run a daily triage routine, and reference alert type definitions. Activates when users need to review, resolve, or triage CRM alerts.
 allowed-tools: ['Bash']
 ---
 
@@ -13,7 +13,7 @@ You are a sales operations assistant helping triage and manage alerts in the Keb
 This skill activates when the user wants to:
 - View active alerts
 - Filter alerts by severity or type
-- Acknowledge an alert
+- Resolve (or reopen) an alert
 - Get a summary of alert volume and trends
 - Run a daily triage routine
 - Understand what different alert types mean
@@ -24,7 +24,7 @@ This skill activates when the user wants to:
 
 Determine which alert workflow the user needs:
 - **List Alerts** — View alerts filtered by severity, type, or status
-- **Acknowledge** — Mark an alert as reviewed/handled
+- **Resolve / Reopen** — Accept an alert as is, for everyone it goes to (or undo that)
 - **Summary** — High-level alert statistics
 - **Daily Triage** — Structured morning triage routine
 - **Alert Types** — Reference guide for alert categories
@@ -32,23 +32,26 @@ Determine which alert workflow the user needs:
 ### Step 2: List Alerts by Severity
 
 ```bash
-crm alerts list                                    # default = unacknowledged, addressed to me
+crm alerts list                                    # default = open, routed to me
 crm alerts list --severity critical
 crm alerts list --severity high
 crm alerts list --type stalled
 crm alerts list --alert-type no_followup           # alias of --type
-crm alerts list --all --format human               # include already acknowledged
+crm alerts list --all --format human               # include resolved and cleared
+crm alerts list --status resolved                  # only resolved
 crm alerts list --scope all                        # everyone's alerts (manager/vp/revops/admin; others get 403)
 crm alerts list --object-type opportunity --object-id <opp_id>  # every alert on one object
 ```
 
-**Who sees what (#2265):** by default an alert list, summary and `ack-all` cover only alerts addressed to the current user — directly, or through their role (e.g. a `cro` audience alert reaches the role mapped to it in server config). `--scope all` is for management roles. `--object-type` + `--object-id` lists every alert on one opportunity, account or order for anyone. Acknowledging an alert not addressed to you returns 404 unless you hold a management role.
+**Who sees what (#2265, #2268 re-plan):** every alert type goes to a configured recipient set — user roles and/or the record's current owner (`crm alerts routing list`, admins change it with `crm alerts routing set <type> --role vp --owner`). By default an alert list, summary and `resolve-all` cover only alerts routed to the current user. `--scope all` is for management roles. `--object-type` + `--object-id` lists every alert on one opportunity, account or order for anyone. There is ONE alert per deal and problem, shared by its recipients: only a recipient may resolve or reopen it (403 otherwise — a management role is not enough unless its role is routed); each alert in the JSON says whether you may (`can_resolve` / `can_reopen`) and who it goes to (`recipients_label`, e.g. `CRO`, `Owner + CRO`).
 
-**Legacy detection rules are off by default.** The scheduled rules (stalled, no_followup, incomplete_meddpicc, ...) run only when an administrator lists their type in the server's `ALERT_ENABLED_TYPES`, and those legacy alerts are addressed to nobody — they show only under `--scope all` or object-scoped. An empty list is therefore normal; do not tell the user "everything is healthy" from an empty alert list — check the pipeline too (Step 5d).
+**Legacy detection rules are off by default.** The scheduled rules (stalled, no_followup, incomplete_meddpicc, ...) run only when an administrator lists their type in the server's `ALERT_ENABLED_TYPES`, and those legacy types are routed to nobody by default — they show only under `--scope all` or object-scoped, and nobody can resolve them until an admin routes the type. An empty list is therefore normal; do not tell the user "everything is healthy" from an empty alert list — check the pipeline too (Step 5d).
 
-**CRO change alerts (#2267).** Three event alerts are raised the moment someone changes an opportunity, addressed to the `cro` audience: `close_date_pushed` (close date moved later at a CRO-watch stage — Offer & Negotiation by default; carries the reason the person had to give), `arr_decreased` (ARR dropped by more than the configured percentage at a watch stage) and `stage_regressed` (any backward stage move, with the reason and whether a manager override was used). They are deduplicated to one alert per opportunity, type and day — further changes the same day are appended to that alert's `details.events`. Like every rule they run only when listed in `ALERT_ENABLED_TYPES`. To see the full trail behind one, run `crm opportunities change-log <opp_id>` (who changed stage, value, ARR, close date, type or owners, how they authenticated, and why).
+**CRO change alerts (#2267).** Three event alerts are raised the moment someone changes an opportunity, routed to the CRO by default and notified at once: `close_date_pushed` (close date moved later at a CRO-watch stage — Offer & Negotiation by default; carries the reason the person had to give), `arr_decreased` (ARR dropped by more than the configured percentage at a watch stage) and `stage_regressed` (any backward stage move, with the reason and whether a manager override was used). They are deduplicated to one alert per opportunity, type and day — further changes the same day are appended to that alert's `details.events`. Like every rule they run only when listed in `ALERT_ENABLED_TYPES`. To see the full trail behind one, run `crm opportunities change-log <opp_id>` (who changed stage, value, ARR, close date, type or owners, how they authenticated, and why).
 
-`--type` (or its alias `--alert-type`) accepts a single value per call. Known rule types include `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`, and the CRO change alerts `close_date_pushed`, `arr_decreased`, `stage_regressed`.
+**CRO condition alerts (#2268, #2270).** A daily check raises `close_date_overdue` (an open deal whose close date has passed, after a configured grace period — renewals included) and `zero_arr_after_demo` (a deal of a configured type — new business and expansion by default, never a flat renewal — past Demo with no ARR). Both are also re-checked when the deal is saved: fixing it clears the alert at once, and a save that causes one raises it for the next morning. One alert per deal and problem, routed to the CRO by default (the owner too if an admin routes the owner). The daily run sends each recipient one summary listing only the alerts NEW since the last check — `crm alerts list` shows everything still open. **Resolving** one of these accepts the deal as it is for everyone: it stays resolved (no new alert, no reminder) while the problem remains, and clears automatically once the deal is fixed (closed, close date moved forward, ARR entered) — so fix the deal rather than resolving when you can. `crm alerts reopen <alert_id>` undoes a resolve (no one is re-notified). A cleared alert cannot be resolved or reopened (409); if the problem returns, a fresh alert is raised. Each alert in the JSON carries `status` (`open` / `resolved` / `cleared`).
+
+`--type` (or its alias `--alert-type`) accepts a single value per call. Known rule types include `eb_engagement_stale`, `champion_not_tested`, `incomplete_meddpicc`, `close_date_risk`, `no_progression`, `stalled`, `no_followup`, the CRO change alerts `close_date_pushed`, `arr_decreased`, `stage_regressed`, and the CRO condition alerts `close_date_overdue`, `zero_arr_after_demo`.
 
 A bundled `--for-csm` preset (one flag, multiple types) is requested by the CSM audit but not exposed by `GET /api/alerts` — see the NOTE block in `crm alerts list --help`. Until then, run the listing once per type or post-filter the JSON output with `jq`.
 
@@ -64,20 +67,20 @@ For each alert, note:
 - Alert ID, type, severity
 - Related account/opportunity
 - When it was triggered
-- Whether it has been acknowledged
+- Its `status` (open / resolved / cleared) and whether you may act on it (`can_resolve`)
 
-### Step 3: Acknowledge an Alert
+### Step 3: Resolve (or Reopen) an Alert
 
 ```bash
-crm alerts ack <alert_id>
+crm alerts resolve <alert_id>
+crm alerts bulk-resolve <alert_id> <alert_id> ...
 ```
 
-Acknowledging an alert means:
-- You have reviewed it
-- You understand what action is needed
-- You are taking responsibility for resolution
+Resolving an alert means you accept it as it is — for everyone it goes to. Only its recipients may resolve it. A resolved condition alert stays resolved while the deal stays as it is and clears itself once the deal is fixed (Step 2). To undo a resolve:
 
-After acknowledging, take the appropriate action based on alert type (see Step 6 for alert type reference).
+```bash
+crm alerts reopen <alert_id>
+```
 
 ### Step 4: View Alert Summary
 
@@ -86,10 +89,10 @@ crm alerts summary
 ```
 
 The summary provides:
-- **Total active alerts** by severity (Critical, High, Medium) addressed to you (`--scope all` for everyone's)
+- **Open and resolved counts**, open alerts by severity (Critical, High, Medium) routed to you (`--scope all` for everyone's)
 - **Alert trends**: Are alerts increasing or decreasing?
 - **Top alert types**: Which categories generate the most alerts
-- **Oldest unacknowledged**: Alerts that have been waiting longest
+- **Oldest open**: Alerts that have been waiting longest
 - **By account**: Which accounts have the most alerts
 
 ### Step 5: Daily Triage Routine
@@ -118,13 +121,13 @@ Check overall alert health:
 - New alert types appearing?
 - Accounts with multiple alerts (may indicate systemic issues)
 
-**Step 5c: Acknowledge handled alerts**
+**Step 5c: Resolve what you accept as is**
 
 ```bash
-crm alerts ack <alert_id>
+crm alerts resolve <alert_id>
 ```
 
-Go through alerts you have already addressed and acknowledge them to keep the list clean.
+Fix the underlying deal where you can (condition alerts clear themselves); resolve only what you accept as it is.
 
 **Step 5d: Check pipeline for new risks**
 
@@ -164,10 +167,12 @@ Common CRM alert types and recommended actions:
 | **Close Date Pushed** (`close_date_pushed`, CRO) | Close date moved later at a watch stage | Read the reason in the alert; check `crm opportunities change-log` for a pattern of slips |
 | **ARR Decreased** (`arr_decreased`, CRO) | ARR dropped by more than the configured percentage at a watch stage | Ask the owner what was removed or discounted |
 | **Stage Regressed** (`stage_regressed`, CRO) | Deal moved back a stage (reason given; manager override flagged) | Review the reason with the owner |
+| **Close date passed** (`close_date_overdue`, CRO) | Open deal whose close date is behind it | Move the close date (with a reason) or close the deal; it clears itself |
+| **No ARR after Demo** (`zero_arr_after_demo`, CRO) | New-business / expansion deal past Demo with no ARR (or ARR of zero or less) | Enter the ARR (or move the deal back); resolve only a zero-ARR deal the CRO accepted |
 
 ## Related RoE Rules
 
-- **Alert response**: Critical alerts must be acknowledged same day
+- **Alert response**: Critical alerts must be handled (fixed or resolved) same day
 - **Stalled deal threshold**: 14 days with no activity triggers an alert
 - **Stage duration**: Discovery (max 60 days), Demo (max 45 days), Offer (max 30 days)
 - **Renewal alerts**: Triggered 90 days before contract expiry
@@ -177,7 +182,8 @@ Common CRM alert types and recommended actions:
 ## Example Prompts
 
 - "Show me all critical alerts"
-- "Acknowledge alert 15"
+- "Resolve alert 15"
+- "Who gets the Close date passed alert?"
 - "Give me the alert summary"
 - "Run the daily triage"
 - "What does the 'stalled deal' alert mean?"

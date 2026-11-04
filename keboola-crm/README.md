@@ -31,7 +31,7 @@ A Claude Code plugin that helps sales reps, managers, and CS teams manage their 
 | `discount-approval` | `/discount-approval` | Discount request and approval workflow with thresholds |
 | `account-enrichment` | `/account-enrichment` | Enrich accounts — Perplexity research, registry search, firmographics |
 | `revenue-analytics` | `/revenue-analytics` | Revenue analytics — ARR, waterfall, NRR, cohorts, dashboard |
-| `alerts-triage` | `/alerts-triage` | Triage alerts — list, acknowledge, summary, daily routine |
+| `alerts-triage` | `/alerts-triage` | Triage alerts — list, resolve / reopen, summary, routing, daily routine |
 | `log-activity` | `/log-activity` | Capture a great activity record — log/edit a meeting or call, record people met (`--met`, auto-links to contacts), set the real date (`--at`), correct in place, link attendees |
 | `plaud-crm-call-import` | `/plaud-crm-call-import` | Import a Plaud recording as a `call` activity — transcript download, account/opportunity match, calendar attendees, fixed 7-section English write-up |
 | `architecture-brief` | `/architecture-brief` | Engineering, **monorepo only** (excluded from the public marketplace build): produce a structured brief (affected modules, files to open, cross-cutting concerns, related ADRs, testing strategy) for a CRM coding task. Pass an issue number or module name. |
