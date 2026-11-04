@@ -417,7 +417,7 @@ crm alerts list --object-type account --object-id <account_id>  # every alert on
 crm alerts list --all --format human               # include resolved and cleared
 ```
 
-By default `crm alerts list` / `summary` cover only alerts routed to you (your role, or you as the record's owner, per the alert type's routing); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
+By default `crm alerts list` / `summary` cover only alerts routed to you (your role, or you as the record's owner, per the alert type's routing); management roles can add `--scope all`. The legacy detection rules are off unless an administrator enables them (Settings → Alerts & Recipients, or the server default), so an empty list is normal — see the `alerts-triage` skill.
 
 A dedicated `--for-csm` preset (a single flag that bundles the CSM-relevant alert types) is requested by the CSM audit but not yet exposed by `GET /api/alerts` (see the NOTE block in `crm alerts list --help`). For now, filter by the relevant `--alert-type` value individually: `account_reassignment`, `eb_engagement_stale`, `stalled`, etc.
 

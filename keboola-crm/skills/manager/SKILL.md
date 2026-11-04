@@ -397,7 +397,7 @@ crm alerts list --scope all --severity critical
 crm alerts list --scope all
 ```
 
-By default you see only alerts addressed to you; `--scope all` widens it to every alert. The legacy detection rules (stalled deals, missing champion / Economic Buyer, close-date risk, ...) are off unless an administrator enables them on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill, and check the pipeline (`crm pipeline health`) rather than reading "no alerts" as "no risk". When those rules are enabled, critical alerts deserve same-day manager attention.
+By default you see only alerts addressed to you; `--scope all` widens it to every alert. The legacy detection rules (stalled deals, missing champion / Economic Buyer, close-date risk, ...) are off unless an administrator enables them (Settings → Alerts & Recipients, or the server default), so an empty list is normal — see the `alerts-triage` skill, and check the pipeline (`crm pipeline health`) rather than reading "no alerts" as "no risk". When those rules are enabled, critical alerts deserve same-day manager attention.
 
 #### Alert summary by severity
 

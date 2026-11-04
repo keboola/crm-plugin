@@ -92,7 +92,7 @@ crm alerts list --severity medium
 crm alerts list
 ```
 
-By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless enabled on the server (`ALERT_ENABLED_TYPES`), so an empty list is normal — see the `alerts-triage` skill.
+By default `crm alerts list` / `summary` cover only alerts addressed to you (directly or through your role); management roles can add `--scope all`. The legacy detection rules are off unless an administrator enables them (Settings → Alerts & Recipients, or the server default), so an empty list is normal — see the `alerts-triage` skill.
 
 Lists CRM alerts such as: close date overdue, no champion identified, missing economic buyer, stuck in stage, contract risk signals. Filter by severity to triage quickly. Always resolve `--severity critical` alerts first.
 
