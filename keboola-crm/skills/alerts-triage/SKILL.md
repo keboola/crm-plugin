@@ -76,7 +76,7 @@ crm alerts resolve <alert_id>
 crm alerts bulk-resolve <alert_id> <alert_id> ...
 ```
 
-Resolving an alert means you accept it as it is — for everyone it goes to. Only its recipients may resolve it. A resolved condition alert stays resolved while the deal stays as it is and clears itself once the deal is fixed (Step 2). To undo a resolve:
+Resolving an alert means you accept it as it is — for everyone it goes to. Only its recipients may resolve it. If the alert has an open thread (`open_thread` in the JSON, see `crm threads show <thread_id>`), add `--resolve-thread` to resolve that thread in the same step; it is never done unless you ask, and is skipped (and reported) when you may not resolve the thread. A resolved condition alert stays resolved while the deal stays as it is and clears itself once the deal is fixed (Step 2). To undo a resolve:
 
 ```bash
 crm alerts reopen <alert_id>
