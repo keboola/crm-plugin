@@ -34,8 +34,8 @@ a rep.
 
 Equally: **`unknown_baseline_count` above zero means the numbers UNDERSTATE
 reality.** Those deals have no determinable net-new ARR and are excluded from every
-total. Exactly two causes, both fixed on the opportunity: no `opportunity_type` is
-set, or nothing prices the deal. Say so when you summarise such a cell.
+total. The cause is fixed on the opportunity: nothing prices the deal. Say so when
+you summarise such a cell.
 
 **And a cell can OVERSTATE without this column moving at all.** Since 2026-08-22 a
 renewal with no predecessor order linked is counted at its FULL contract value
@@ -45,7 +45,7 @@ ARR. Those deals are *not* in `unknown_baseline_count` and carry
 healthy ones. A zero Unknown column is therefore **not** evidence that a cell is
 correct. To check, run `crm forecast opportunities` and read the **Flag** column:
 `over: no pred` marks exactly these rows, and the fix is to link the predecessor
-order. The three `out:` markers are the understating cases above.
+order. The two `out:` markers are the understating cases above.
 
 ## Step-by-Step Workflow
 
