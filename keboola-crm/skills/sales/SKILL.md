@@ -522,17 +522,24 @@ crm opportunities proposal OPP_ID
 
 Generates a deal summary and proposal brief based on MEDDPICC data, account profile, and ARR. Intended as the basis for a formal proposal document.
 
-#### Request a discount
+#### Discount a deal
+
+There is no opportunity-level discount request: a deal without line items takes no discount, and a deal with line items has two discount types, both entered as line items:
+
+- **Order-level: a Discount line** — one one-time line carrying the monthly discount amount:
 
 ```bash
-crm discounts request OPP_ID PERCENT JUSTIFICATION
+crm opportunities line-items add OPP_ID --revenue-type discount --unit-price MONTHLY_AMOUNT --qty 1 --discount-justification "REASON"
 ```
 
-Submits a discount approval request. `PERCENT` is a number (e.g. `15` for 15%). `JUSTIFICATION` is a quoted string explaining the business reason. Routing is config-driven (`settings.discount_approval_threshold_percent`, default 10% — #910):
-- At or below the threshold: auto-approved, the opportunity ARR is updated immediately
-- Above the threshold: a pending request is created for manager review
+- **Item-level: a line discount** on a recurring or one-off line, as a percent or an amount for the line's Amount period:
 
-Line-item discounts (per-product `discount_percent` on the deal) are legacy-only (GH #2099): a new line can no longer be given a non-zero discount_percent, though an already-discounted legacy line can still be re-priced. Discounting now goes through an order-level Discount line instead; the tier ladder below (`settings.discount_approval_tier_ceilings`: ≤15% Tier 1 — Sales Manager, 15–25% Tier 2 — CRO, >25% Tier 3 — CFO / Deal Desk, no upper cap, no auto-approval) only still applies to editing an existing legacy line.
+```bash
+crm opportunities line-items add OPP_ID --product PRODUCT_ID --qty 1 --discount-percent N --discount-justification "REASON"
+crm opportunities line-items update OPP_ID LINE_ID --discount-amount AMOUNT --discount-justification "REASON"
+```
+
+The two do not combine on one deal. Either is approved through the line-items / Discount-line approval queue (`crm discounts list --status pending`), tiered by the percent (`settings.discount_approval_tier_ceilings`: ≤15% Tier 1 — Sales Manager, 15–25% Tier 2 — CRO, >25% Tier 3 — CFO / Deal Desk, no upper cap, no auto-approval).
 
 **Discount request workflow:**
 
@@ -695,8 +702,8 @@ crm opportunities checklist OPP_ID
 # Step 3: Generate the proposal brief
 crm opportunities proposal OPP_ID
 
-# Step 4: If a discount is needed
-crm discounts request OPP_ID 15 "Competitive pressure from Fivetran; customer has 3-year commit"
+# Step 4: If a discount is needed, add a Discount line (or a line discount)
+crm opportunities line-items add OPP_ID --revenue-type discount --unit-price 1000 --qty 1 --discount-justification "Competitive pressure from Fivetran; customer has 3-year commit"
 
 # Step 5: Monitor discount status
 crm discounts list --status pending
@@ -791,7 +798,7 @@ Discovery requires Metrics and Economic Buyer to be identified before advancing 
 Warn the user when a deal has been in the same stage for 30 days. Treat it as critical at 60 days — the deal should either advance or be disqualified. A deal sitting in stage with no movement is not a deal.
 
 **Rule 4 — Discount approval thresholds.**
-Config-driven, two flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below `settings.discount_approval_threshold_percent` (default 10%) and go to manager review above it. Line-item discounts route through `settings.discount_approval_tier_ceilings`:
+Config-driven (#910). There is no opportunity-level request and no auto-approval: a Discount line or a line discount routes through `settings.discount_approval_tier_ceilings`:
 - Up to 15%: Tier 1 — Sales Manager
 - Greater than 15% and up to 25%: Tier 2 — CRO
 - Greater than 25%: Tier 3 — CFO / Deal Desk (no upper cap, no auto-approval)
@@ -963,7 +970,7 @@ If champion test passes and checklist is clean:
 4. crm opportunities proposal OPP_ID   — generate proposal brief
 
 If customer is asking for a discount:
-5. crm discounts request OPP_ID 18 "3-year commitment, displaced Informatica"
+5. crm opportunities line-items add OPP_ID --revenue-type discount --unit-price MONTHLY_AMOUNT --qty 1 --discount-justification "3-year commitment, displaced Informatica"
 6. crm discounts list --status pending  — monitor approval
 
 After deal signs:

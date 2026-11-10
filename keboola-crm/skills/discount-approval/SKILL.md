@@ -1,6 +1,6 @@
 ---
 name: discount-approval
-description: Manage discount request and approval workflows — submit discount requests with justification, list pending requests, approve or reject with notes, and apply the config-driven thresholds (opportunity-level requests auto-approve at or below the configured threshold; line-item discounts roll up into one aggregate request per opportunity, proposal or order, routed to the approval tier its configured ceilings give). Activates when users need to request, review, or approve discounts on opportunities.
+description: Manage discount request and approval workflows — raise a discount as a Discount line or a line discount, list pending requests, approve or reject with notes, and apply the config-driven tiers (line-item discounts roll up into one aggregate request per opportunity, proposal or order, routed to the approval tier its configured ceilings give; there is no opportunity-level percentage request). Activates when users need to request, review, or approve discounts on opportunities.
 allowed-tools: ['Bash']
 ---
 
@@ -37,11 +37,16 @@ crm opportunities get <opportunity_id>
 crm accounts get <account_id>
 ```
 
-Then submit the request:
+Then raise the discount as a line item. There is no opportunity-level request: a deal without line items takes no discount, and a deal with line items has two discount types.
 
 ```bash
-crm discounts request <opportunity_id> <percent> <justification>
+# Order-level: a Discount line (one-time, monthly amount)
+crm opportunities line-items add <opportunity_id> --revenue-type discount --unit-price <monthly_amount> --qty 1 --discount-justification "<reason>"
+# Item-level: a line discount (percent or amount for the line's Amount period)
+crm opportunities line-items update <opportunity_id> <line_id> --discount-percent <percent> --discount-justification "<reason>"
 ```
+
+Both go to the approval queue (`crm discounts list --status pending`); the two do not combine on one deal.
 
 The request must include:
 - **Requested discount %**: The percentage discount being requested
@@ -160,8 +165,8 @@ After any discount action, summarize:
 ## Related RoE Rules
 
 - **Minimum ACV after discount**: $70K for Core, $75K for Strategic, $200K for Enterprise
-- **Approval chain**: two config-driven flows (#910). Opportunity-level requests (`crm discounts request`) auto-approve at or below the configured `discount_approval_threshold_percent` and create a pending request for manager review above it. Line-item discounts route through the tier ladder `discount_approval_tier_ceilings` — Tier 1 (Sales Manager), Tier 2 (CRO), Tier 3 (CFO / Deal Desk) with no upper cap and no auto-approval. Read the live ceilings from `/api/config/public`.
-- **A discount cannot exceed the price**: `crm discounts request` rejects a percentage above 100 with a 422 (#1104). "No upper cap" above is about *who approves* a deep discount, not about how large the number may be — at 100% the customer pays nothing, and beyond that we would be paying them. If a rep asks for more than 100%, they are describing something else (a credit, a rebate, a negative line item) — clarify what they mean rather than retrying the request.
+- **Approval chain**: two config-driven flows (#910). Every discount (a Discount line or a line discount) routes through the tier ladder `discount_approval_tier_ceilings` — Tier 1 (Sales Manager), Tier 2 (CRO), Tier 3 (CFO / Deal Desk) with no upper cap and no auto-approval. Read the live ceilings from `/api/config/public`.
+- **A discount cannot exceed the price**: a line discount above 100% is rejected with a 422 (#1104). "No upper cap" above is about *who approves* a deep discount, not about how large the number may be — at 100% the customer pays nothing, and beyond that we would be paying them. If a rep asks for more than 100%, they are describing something else (a credit, a rebate, a negative line item) — clarify what they mean rather than retrying the request.
 - **Multi-year offset**: 3-year commitment grants +5% discount flexibility
 - **No retroactive discounts**: Discounts apply to new/renewal terms only
 - **Discount stacking**: Cannot combine multiple discount programs (volume + competitive + strategic)

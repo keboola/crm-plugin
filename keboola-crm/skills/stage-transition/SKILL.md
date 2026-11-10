@@ -140,9 +140,10 @@ If moving to Closed Lost at any stage:
 
 If commercial terms require a discount:
 
-```bash
-crm discounts request <opportunity_id> <percent> <justification>
-```
+A discount is a line item: add a Discount line
+(`crm opportunities line-items add <opportunity_id> --revenue-type discount --unit-price <monthly_amount> --qty 1 --discount-justification "..."`)
+or a line discount (`--discount-percent` / `--discount-amount` with
+`--discount-justification` on `crm opportunities line-items add|update`).
 
 Document justification and get approval before finalizing offer.
 

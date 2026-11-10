@@ -465,9 +465,8 @@ Approval authority (config-driven `settings.discount_approval_tier_ceilings`, #9
 - Tier 2 — CRO: 15–25%
 - Tier 3 — CFO / Deal Desk: greater than 25% (no upper cap)
 
-Opportunity-level requests (`crm discounts request`) auto-approve at or
-below `settings.discount_approval_threshold_percent` (default 10%) and
-only reach this queue above it.
+Every discount (a Discount line or a line discount) reaches this queue; there
+is no opportunity-level request and no auto-approval.
 
 ---
 
