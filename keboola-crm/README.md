@@ -55,7 +55,7 @@ uv tool install <crm-app-url>/downloads/keboola_crm_cli-<VERSION>-py3-none-any.w
 crm config init --api-url <your-crm-api-url> --token <your-pat-token>
 ```
 
-To obtain a PAT token, ask your CRM admin or generate one from the CRM web UI under Settings > API Tokens.
+To obtain a PAT token, ask your CRM admin or generate one from the CRM web UI under Settings > MCP & API.
 
 Verify the connection:
 
