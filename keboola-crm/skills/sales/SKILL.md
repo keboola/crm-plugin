@@ -1054,7 +1054,7 @@ crm orders list --account ACCOUNT_ID --status draft --format human
 # Review and activate the order
 crm orders get ORDER_ID --format human
 
-# Activate the order once signed. Signed outside the CRM (paper, DocuSign run
+# Activate the order once signed. Signed outside the CRM (paper, signed
 # by hand)? Pass the date on the signed document — the server refuses
 # (422 client_signed_at_required) when the order has no signature date yet.
 # Never guess it; ask the user.
