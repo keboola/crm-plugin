@@ -148,10 +148,10 @@ The handover system provides structured account transfers between team members. 
 #### Initiate an account handover
 
 ```bash
-crm handovers initiate ACCOUNT_ID
+crm handovers initiate ACCOUNT_ID --to-user-id USER_ID --reason rep_departure [--context "..."]
 ```
 
-Starts a formal handover process for an account. You will be prompted for: the new owner (user ID or email), handover reason (territory_change, rep_departure, rebalancing), and any special notes. The command creates a handover record and notifies the receiving party.
+Starts a formal handover process for an account. `--to-user-id` is the receiving owner and `--reason` is one of territory_change, rep_departure, strategic, other (see `crm handovers initiate --help`). `--context` carries notes about the customer relationship. The command creates a handover record and notifies the receiving party.
 
 **When to initiate a handover:**
 - When you are leaving the company or changing roles
