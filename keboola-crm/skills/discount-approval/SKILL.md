@@ -1,6 +1,6 @@
 ---
 name: discount-approval
-description: Manage discount request and approval workflows — raise a discount as a Discount line or a line discount, list pending requests, approve or reject with notes, and apply the config-driven tiers (line-item discounts roll up into one aggregate request per opportunity, proposal or order, routed to the approval tier its configured ceilings give; there is no opportunity-level percentage request). Activates when users need to request, review, or approve discounts on opportunities.
+description: Manage discount request and approval workflows — raise a discount as a Discount line or a line discount, list pending requests, approve or reject with notes, and apply the config-driven tiers (line-item discounts roll up into one aggregate request per opportunity, proposal or order, approved tier by tier from Tier 1 up to the tier its configured ceilings give, a higher tier able to approve on behalf with a reason; there is no opportunity-level percentage request). Activates when users need to request, review, or approve discounts on opportunities.
 allowed-tools: ['Bash']
 ---
 
@@ -66,6 +66,22 @@ ceilings are configuration (`discount_approval_tier_ceilings`, served by
 | up to the Tier 2 ceiling | Tier 2 — CRO | Strategic account, market entry, large deal |
 | above it (uncapped) | Tier 3 — CFO / Deal Desk | Exceptional circumstances, executive-level commitment |
 
+**Cascading approval chain (#2635).** A request of Tier N needs one approval
+from each tier 1..N, **in order**, and stays `pending` (still gating Closed Won,
+signature send and order activation) until its last step is approved. Tier 1 is
+team-scoped: only a Tier 1 approver whose org-chart team (recursive reports)
+holds the requester decides it; Tier 2+ steps go to every approver on that tier.
+A step nobody can act on (no team approver, or a tier with no approver) is
+`skipped` and the next tier up decides. Never work this out yourself — read it
+off the request (`crm discounts get <id>`): `current_step` is the tier it waits
+on, `steps` lists each step (status, decided by, on-behalf reason), and
+`decision_right` says how the caller may decide it: `own_tier`, `on_behalf`
+(a higher tier filling a lower step — approving then **requires** `--notes` as
+the reason, at least `discount_review_notes_min_length` characters), or null
+(`can_decide` false: they may not). Reminders go to the current step's
+approvers and every tier above after the configured number of working days
+(default 2), repeated at that interval.
+
 **Line-item discounts (KIDS-541).** A discount on an individual line is entered
 as an **amount** for the line's Amount period (per month on a recurring line,
 the whole line on a one-off); the CRM derives and stores the percent, and a
@@ -88,7 +104,7 @@ contract value and always queued (no auto-approve):
 
 **Important rules:**
 - **No upper cap.** Every discount routes through the approval queue regardless of size — the Tier 3 (CFO / Deal Desk) approver can sign off on any discount the rep can justify. The earlier 50% hard reject was dropped per the deal-desk feedback round.
-- Tier ceilings are sourced from `settings.discount_approval_tier_ceilings` (override via `DISCOUNT_APPROVAL_TIER_CEILINGS` env var). The Settings → Discount Approvers admin tab is the source of truth for who can sign off in which tier.
+- Tier ceilings are sourced from `settings.discount_approval_tier_ceilings` (override via `DISCOUNT_APPROVAL_TIER_CEILINGS` env var). The Settings → Discount Approvers admin tab is the source of truth for who sits on which tier (`crm discounts approvers list` shows each approver's tier and any warning, e.g. a Tier 1 approver with no employee record, so no team).
 - All discounts must be documented with business justification
 - Discounts are applied to ACV, not one-time fees
 - Multi-year commitments can justify higher discounts (e.g., 3-year = up to 15% without escalation)
@@ -97,8 +113,11 @@ contract value and always queued (no auto-approve):
 ### Step 4: List Pending Requests (Manager)
 
 ```bash
-crm discounts list
+crm discounts list --status pending --format human
 ```
+
+"Waiting On" is the tier whose step each request waits on, "You Decide" how you
+may decide it (empty: you may not — do not offer to approve it).
 
 For each pending request, review:
 - Opportunity name and account
@@ -112,10 +131,17 @@ For each pending request, review:
 
 ```bash
 crm discounts approve <discount_request_id>
+# decision_right == on_behalf: a lower tier's step is open; the reason is required
+crm discounts approve <discount_request_id> --notes "<why you approve in Tier N's place>"
 ```
 
+Approving decides the step the request waits on. If it is not the last step,
+the request stays pending and the next tier is notified. On behalf, every open
+step below your tier is filled in its tier's place and those approvers are
+told who approved and why — confirm with the user before doing that.
+
 Before approving, verify:
-- The discount is within your approval authority
+- `decision_right` is set on the request (the CRM refuses otherwise)
 - The justification is legitimate and documented
 - The competitive pressure is real (not just a negotiation tactic)
 - Offsetting terms have been explored (longer term, case study, etc.)
@@ -130,8 +156,10 @@ Add approval notes explaining:
 ### Step 6: Reject a Discount Request
 
 ```bash
-crm discounts reject <discount_request_id>
+crm discounts reject <discount_request_id> --notes "<reason>"
 ```
+
+A reject at any step rejects the whole request.
 
 When rejecting, provide:
 - Clear reason for rejection
