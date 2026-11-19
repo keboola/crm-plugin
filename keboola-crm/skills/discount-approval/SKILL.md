@@ -46,7 +46,7 @@ crm opportunities line-items add <opportunity_id> --revenue-type discount --unit
 crm opportunities line-items update <opportunity_id> <line_id> --discount-percent <percent> --discount-justification "<reason>"
 ```
 
-Both go to the approval queue (`crm discounts list --status pending`); the two do not combine on one deal.
+Both go to the approval queue (`crm discounts list --status pending`); the two do not combine on one deal. An opportunity, proposal or order holds at most one Discount line: to change the discount, update that line (`crm opportunities line-items update … --unit-price …`) — adding a second one is refused (422 `discount_line_already_present`).
 
 The request must include:
 - **Requested discount %**: The percentage discount being requested
