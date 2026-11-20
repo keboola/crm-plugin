@@ -28,12 +28,16 @@ with any state-changing step confirmed first.
      API is reachable. If it fails, stop and report exactly what is
      unconfigured (do **not** guess an API URL or token).
    - `crm auth me --format json` — learn **who you are acting as**
-     (`id`, `email`, `role`). The CLI carries a single token; you act
-     as exactly that user with their role's permissions. You
+     (`id`, `email`, `role` = the primary role, `roles` = every role
+     held, `permissions`). The CLI carries a single token; you act as
+     exactly that user with the permissions of every role they hold
+     (`permissions` is that union). You
      cannot impersonate another user — if a task needs a different
      persona's data, say so rather than faking it.
 
-2. **Pick the persona skill from the role**, then layer task skills:
+2. **Pick the persona skill from the primary `role`** (a user holding
+   several roles still has one primary), then layer task skills — the
+   other roles in `roles` widen what you may do, not the persona:
    | `role` from `crm auth me` | Primary persona skill |
    |---|---|
    | `rep` | `sales` |
